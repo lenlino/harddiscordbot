@@ -8,6 +8,10 @@ plugins {
 group = "com.lenlino"
 version = "1.0-SNAPSHOT"
 
+tasks.register("stage"){
+    dependsOn("clean","shadowJar")
+}
+
 repositories {
     mavenCentral()
     maven("https://m2.dv8tion.net/releases")
