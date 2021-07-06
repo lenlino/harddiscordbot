@@ -12,6 +12,10 @@ tasks.register("stage"){
     dependsOn("clean","shadowJar")
 }
 
+tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>{
+    archiveFileName.set("bot.jar")
+}
+
 repositories {
     mavenCentral()
     maven("https://m2.dv8tion.net/releases")
