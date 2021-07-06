@@ -102,5 +102,5 @@ class BotClient{
 fun main() {
     val token = System.getenv("Discord_Bot_Token")
     val bot = BotClient()
-    bot.main(token)
+    bot.main("ODYwODI3MTc0NTQxNzIxNjAw.YOA5xw.HRgcoZNRnR8fmAAM2rZZqNOY6oU")
 }

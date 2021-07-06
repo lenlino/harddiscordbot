@@ -34,6 +34,8 @@ tasks.getByName<Test>("test") {
     useJUnitPlatform()
 }
 
+
+
 application {/*applicationブロックごと追記*/
-    mainClass.set("${group}.${rootProject.name}.MainKt")
+    mainClass.set("MainKt")
 }
