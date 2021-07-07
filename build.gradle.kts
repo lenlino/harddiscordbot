@@ -37,5 +37,5 @@ tasks.getByName<Test>("test") {
 
 
 application {/*applicationブロックごと追記*/
-    mainClass.set("MainKt")
+    mainClass.set("${group}.${rootProject.name}.MainKt")
 }
