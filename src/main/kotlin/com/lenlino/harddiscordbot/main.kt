@@ -41,28 +41,21 @@ event?.message?.channel?.sendMessageFormat("")?.queue()
 
 class help:Command(){/*Commandクラスを継承してコマンドを定義*/
 init {
-    this.name = "hel" /*コマンド文字列の定義はinitブロックの中に書く必要があります。*/
+    this.name = "help" /*コマンド文字列の定義はinitブロックの中に書く必要があります。*/
 }
     override fun execute(event: CommandEvent?){
 /*executeメソッドはコマンドを叩かれたイベントをキャッチして対応する処理を実行する中核部分です*/
         val embed = EmbedBuilder()//EmbedBuilderでインスタンスを作成して、後から中身をセットします。
             //タイトル文字列。第2引数にURLを入れるとタイトルを指定URLへのリンクにできます
-            .setTitle("Tutorial Embed","https://example.com")
+            .setTitle("ヘルプ")
 
             //Botの情報。タイトルと同じくリンクを指定できる他、第3引数にアイコン画像を指定できます。
             //今回は自分のアバターアイコンを指定しました。
-            .setAuthor("tutorial bot","https://repo.exapmle.com/bot",event?.selfUser?.avatarUrl)
 
-            .appendDescription("Embed made with Kotlin JDA!!") //Embedの説明文
+            .appendDescription("すべてのコマンドの前には.をつける必要があります") //Embedの説明文
             .setColor(0x00ff00) //Embed左端の色を設定します。今回は緑。
-            .addField("フィールド1","値1",false) //以下3つフィールドをセット
-            .addField("フィールド2","値2",true)
-            .addField("フィールド3","値3",true)
-            .setThumbnail("https://image.example.com/thumbnail.png") //サムネイル(小さい画像)
-            .setImage("https://image.example.com/main.png") //イメージ(大きい画像)
-
-            //フッターには開発者情報を入れるといいでしょう。
-            .setFooter("made by NashiroAoi","https://dev.exapmple.com/profile.png")
+            .addField("neko","にゃー",false) //以下3つフィールドをセット
+            .addField(".mcserver <サーバーアドレス>","minecraftサーバーステータスを取得",false)
             .build() //buildは一番最後の組み立て処理です。書き忘れないようにしましょう。
         event?.reply(embed)
 /*
