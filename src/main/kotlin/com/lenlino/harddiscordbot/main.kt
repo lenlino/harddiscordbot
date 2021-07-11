@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.JDABuilder
 import net.dv8tion.jda.api.requests.GatewayIntent
+import java.util.function.Consumer
 
 
 class Neko:Command(){/*Commandクラスを継承してコマンドを定義*/
@@ -55,7 +56,8 @@ init {
             .appendDescription("すべてのコマンドの前には.をつける必要があります") //Embedの説明文
             .setColor(0x00ff00) //Embed左端の色を設定します。今回は緑。
             .addField("neko","にゃー",false) //以下3つフィールドをセット
-            .addField(".mcserver <サーバーアドレス>","minecraftサーバーステータスを取得",false)
+            .addField("mcserver <サーバーアドレス>","minecraftサーバーステータスを取得",false)
+            .addField("mcskin <ユーザー名>","minecraftスキンを取得",false)
             .build() //buildは一番最後の組み立て処理です。書き忘れないようにしましょう。
         event?.reply(embed)
 /*
@@ -79,7 +81,7 @@ class BotClient{
         val commandClient = CommandClientBuilder()
             .setPrefix(commandPrefix)
             .setOwnerId("") /*本来であれば開発者のIDを入れますが、空文字列でもOKです。*/
-            .addCommands(Neko(),kick(),help(),about())
+            .addCommands(Neko(),kick(),help(),about(),mcskin())
             .useHelpBuilder(false)
             .build()
 
