@@ -36,6 +36,7 @@ init {
             ppstadd?.close()
         }
         psts?.close()
+        conn?.close()
 
 /*
 ここで使われているreplyメソッドは

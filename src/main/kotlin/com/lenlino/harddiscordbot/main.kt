@@ -127,6 +127,7 @@ class BotClient: ListenerAdapter(){
             }
             stmt.close()
             psts.close()
+            conn.close()
         }
 
     }
