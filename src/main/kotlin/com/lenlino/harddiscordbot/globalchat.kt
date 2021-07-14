@@ -23,8 +23,9 @@ init {
 /*executeメソッドはコマンドを叩かれたイベントをキャッチして対応する処理を実行する中核部分です*/
         val conn = getConnection()
         val psts = conn?.prepareStatement("SELECT * FROM discord WHERE server_id = ?")
-        psts?.setString(1, event?.guild?.id);
-        if (psts?.executeQuery()?.row==0) {
+        psts?.setString(1, event?.guild?.id)
+        val rs = psts?.executeQuery()
+        if (rs!!.next()) {
             val ppst = conn?.prepareStatement("INSERT INTO discord values (?,?)")
             ppst?.setString(1,event?.guild?.id)
             ppst?.setString(2,event?.channel?.id)
