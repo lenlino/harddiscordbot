@@ -63,6 +63,7 @@ init {
             .addField("neko","にゃー",false) //以下3つフィールドをセット
             .addField("mcserver <サーバーアドレス>","minecraftサーバーステータスを取得",false)
             .addField("mcskin <ユーザー名>","minecraftスキンを取得",false)
+            .addField("gcset","グローバルチャットを設定",false)
             .build() //buildは一番最後の組み立て処理です。書き忘れないようにしましょう。
         event?.reply(embed)
 /*
