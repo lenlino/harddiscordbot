@@ -24,7 +24,7 @@ init {
         val conn = getConnection()
         val psts = conn?.prepareStatement("SELECT * FROM discord WHERE server_id = ?")
         psts?.setString(1, event?.guild?.id);
-        if (!psts?.execute()!!) {
+        if (psts?.execute()!!) {
             val ppst = conn?.prepareStatement("INSERT INTO discord values (?,?)")
             ppst?.setString(1,event?.guild?.id)
             ppst?.setString(2,event?.channel?.id)
