@@ -19,6 +19,7 @@ init {
     this.name = "gcset" /*コマンド文字列の定義はinitブロックの中に書く必要があります。*/
 }
     override fun execute(event: CommandEvent?){
+        event?.reply("コマンドが実行")
 /*executeメソッドはコマンドを叩かれたイベントをキャッチして対応する処理を実行する中核部分です*/
         val conn = getConnection()
         val psts = conn?.prepareStatement("SELECT * FROM discord WHERE server_id = ?")
@@ -29,12 +30,14 @@ init {
             ppst?.setString(2,event?.channel?.id)
             ppst?.executeUpdate()
             ppst?.close()
+            event?.reply("完了")
         } else {
             val ppstadd = conn?.prepareStatement("UPDATE discord SET gchannel_id = ? WHERE server_id = ?")
             ppstadd?.setString(1,event?.channel?.id)
             ppstadd?.setString(2,event?.guild?.id)
             ppstadd?.executeUpdate()
             ppstadd?.close()
+            event?.reply("完了1")
         }
         psts?.close()
         conn?.close()
