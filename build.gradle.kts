@@ -23,6 +23,7 @@ repositories {
 }
 
 dependencies {
+    implementation("org.postgresql:postgresql:42.2.23")
     implementation(kotlin("stdlib"))
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.0")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
