@@ -14,12 +14,13 @@ import java.net.URISyntaxException
 import java.sql.*
 
 class gcset:Command(){/*Commandクラスを継承してコマンドを定義*/
-    val conn = getConnection()
+
 init {
     this.name = "gcset" /*コマンド文字列の定義はinitブロックの中に書く必要があります。*/
 }
     override fun execute(event: CommandEvent?){
 /*executeメソッドはコマンドを叩かれたイベントをキャッチして対応する処理を実行する中核部分です*/
+        val conn = getConnection()
         val psts = conn?.prepareStatement("SELECT * FROM discord WHERE server_id = ?")
         psts?.setString(1, event?.guild?.id);
         if (!psts?.execute()!!) {

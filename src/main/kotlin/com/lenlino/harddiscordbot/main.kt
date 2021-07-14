@@ -76,7 +76,7 @@ event?.message?.channel?.sendMessageFormat("")?.queue()
 
 
 class BotClient: ListenerAdapter(){
-    val conn = getConnection()
+
     lateinit var jda: JDA
     private val commandPrefix = "." /*コマンドプレフィックスの指定
                                      空文字列にするとBotへのメンションがプレフィックスとして機能します。
@@ -107,6 +107,7 @@ class BotClient: ListenerAdapter(){
     override fun onGuildMessageReceived(event : GuildMessageReceivedEvent) {
         //Botがメッセージを受信したときの処理
         if(!event.member?.user?.isBot!!){//メッセージ内容を確認
+            val conn = getConnection()
             val stmt: Statement = conn!!.createStatement()
             val psts: PreparedStatement = conn.prepareStatement("SELECT * FROM discord WHERE server_id=?")
             psts.setString(1, event?.guild?.id);
