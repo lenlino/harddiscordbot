@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.events.ReadyEvent
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 import net.dv8tion.jda.api.requests.GatewayIntent
+import java.awt.Color
 import java.net.URI
 import java.net.URISyntaxException
 import java.sql.*
@@ -64,6 +65,8 @@ init {
             .addField("mcserver <サーバーアドレス>","minecraftサーバーステータスを取得",false)
             .addField("mcskin <ユーザー名>","minecraftスキンを取得",false)
             .addField("gcset","グローバルチャットを設定",false)
+            .addField("vote <タイトル> <項目１> <項目２>...","投票を設定(new!)",false)
+            .addField("voter <投票ID>","投票結果をグラフで表示(new!)",false)
             .build() //buildは一番最後の組み立て処理です。書き忘れないようにしましょう。
         event?.reply(embed)
 /*
@@ -88,7 +91,7 @@ class BotClient: ListenerAdapter(){
         val commandClient = CommandClientBuilder()
             .setPrefix(commandPrefix)
             .setOwnerId("") /*本来であれば開発者のIDを入れますが、空文字列でもOKです。*/
-            .addCommands(Neko(),kick(),help(),about(),mcskin(),gcset())
+            .addCommands(Neko(),kick(),help(),about(),mcskin(),gcset(),poll(),pollresult())
             .useHelpBuilder(false)
             .build()
 
@@ -118,13 +121,12 @@ class BotClient: ListenerAdapter(){
                 if(rs.getString("gchannel_id").equals(event.channel.id)) {
                     val rs = stmt.executeQuery("SELECT * FROM discord")
                     while (rs.next()) {
-                        if (!rs.getString("server_id").equals(event.guild.id)) {
+                        if (!rs.getString("gchannel_id").equals(event.channel.id)) {
                             val guild = jda.getGuildById(rs.getString("server_id"))
                             val channel = guild?.getTextChannelById(rs.getString("gchannel_id"))
-                            channel?.sendMessage(event.member!!.user.name+" » "+event.message.contentDisplay)?.queue()
+                            channel?.sendMessage(event.member!!.effectiveName + " » " + event.message.contentDisplay)?.queue()
                         }
                     }
-
                 }
             }
             stmt.close()
