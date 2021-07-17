@@ -4,16 +4,15 @@ import com.jagrosh.jdautilities.command.Command
 import com.jagrosh.jdautilities.command.CommandEvent
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.entities.Message
-import net.dv8tion.jda.api.exceptions.ContextException
-import net.dv8tion.jda.api.exceptions.ErrorResponseException
 import org.jfree.chart.ChartFactory
 import org.jfree.chart.ChartUtils
 import org.jfree.chart.StandardChartTheme
 import org.jfree.chart.labels.StandardPieSectionLabelGenerator
 import org.jfree.chart.plot.PiePlot
+import org.jfree.chart.title.TextTitle
 import org.jfree.data.general.DefaultPieDataset
-import org.postgresql.shaded.com.ongres.scram.common.bouncycastle.pbkdf2.Integers
 import java.awt.Color
+import java.awt.Font
 import java.io.File
 import java.util.*
 
@@ -87,6 +86,7 @@ init {
                         val chart = ChartFactory.createPieChart(embed.title, pie, true, false, false)
                         val piePlot = chart.plot as PiePlot<*>
                         piePlot.setLabelGenerator(StandardPieSectionLabelGenerator("{0} {2} {1}票"))
+                        piePlot.setLabelFont(Font.getFont("NotoSansJP-Light"))
 
 
                         ChartUtils.saveChartAsPNG(file, chart, 400, 400)
