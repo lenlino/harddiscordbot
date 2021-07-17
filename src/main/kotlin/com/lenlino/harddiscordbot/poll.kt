@@ -16,7 +16,7 @@ import java.awt.Font
 import java.io.File
 import java.util.*
 
-
+val alphabed :List<String> = Arrays.asList("\uD83C\uDDE6","\uD83C\uDDE7","\uD83C\uDDE8","\uD83C\uDDE9","\uD83C\uDDEA","\uD83C\uDDEB","\uD83C\uDDEC")
 class poll: Command() {/*Commandクラスを継承してコマンドを定義*/
 init {
     this.name = "poll" /*コマンド文字列の定義はinitブロックの中に書く必要があります。*/
@@ -32,7 +32,6 @@ init {
         event?.reply(args.toString())
 
         if (args?.size!! >1) {
-            val alphabed :List<String> = Arrays.asList("\uD83C\uDDE6","\uD83C\uDDE7","\uD83C\uDDE8","\uD83C\uDDE9","\uD83C\uDDEA","\uD83C\uDDEB","\uD83C\uDDEC")
             val embed = EmbedBuilder().setTitle(args[0])
             for (i in 1..args.size-1) {
                 embed.appendDescription(alphabed[i-1]+args[i]+"\n")
@@ -81,7 +80,7 @@ init {
                         val reaction = t.reactions
                         val file = File("pie.png")
                         for(i in 0..list?.size!! -1) {
-                            pie.setValue(list[i],reaction[i].count-1)
+                            pie.setValue(list[i].replace(alphabed[i],""),reaction[i].count-1)
                         }
                         val chart = ChartFactory.createPieChart(embed.title, pie, true, false, false)
                         val piePlot = chart.plot as PiePlot<*>
