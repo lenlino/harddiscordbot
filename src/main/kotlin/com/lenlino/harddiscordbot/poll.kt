@@ -85,7 +85,7 @@ init {
                         }
                         val chart = ChartFactory.createPieChart(embed.title, pie, true, false, false)
                         val piePlot = chart.plot as PiePlot<*>
-                        val Font = Font("NoteSansJP-Light", Font.BOLD, 12)
+                        val Font = Font("TakaoPGothic", Font.PLAIN, 12)
                         piePlot.setLabelGenerator(StandardPieSectionLabelGenerator("{0} {2} {1}票"))
                         piePlot.setLabelFont(Font)
 
