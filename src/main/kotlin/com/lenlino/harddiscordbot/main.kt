@@ -65,8 +65,8 @@ init {
             .addField("mcserver <サーバーアドレス>","minecraftサーバーステータスを取得",false)
             .addField("mcskin <ユーザー名>","minecraftスキンを取得",false)
             .addField("gcset","グローバルチャットを設定",false)
-            .addField("vote <タイトル> <項目１> <項目２>...","投票を設定(new!)",false)
-            .addField("voter <投票ID>","投票結果をグラフで表示(new!)",false)
+            .addField("poll <タイトル> <項目１> <項目２>...","投票を設定(new!)",false)
+            .addField("pollr <投票ID>","投票結果をグラフで表示(new!)",false)
             .build() //buildは一番最後の組み立て処理です。書き忘れないようにしましょう。
         event?.reply(embed)
 /*
