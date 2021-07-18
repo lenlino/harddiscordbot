@@ -15,7 +15,7 @@ import java.net.URL
 import java.nio.charset.Charset
 
 
-class about: Command(){
+class mcserver: Command(){
     init {
         this.name="mcserver"
         this.help="BOTの情報を表示"
@@ -104,5 +104,23 @@ fun readJsonFromUrl(url: String?): JSONObject {
 
     } finally {
         `is`.close()
+    }
+}
+
+class about: Command(){
+    init {
+        this.name="about"
+        this.help="BOTの情報を表示"
+    }
+
+    override fun execute(event: CommandEvent?) {
+        val embed = EmbedBuilder()
+            .setTitle("Info")
+            .addField("サーバー導入数",event?.jda?.guilds?.size.toString(),false)
+            .setAuthor("BOTの招待はこちらから！","https://discord.com/api/oauth2/authorize?client_id=860827174541721600&permissions=0&scope=bot")
+            .build()
+        event?.reply(embed)
+
+
     }
 }

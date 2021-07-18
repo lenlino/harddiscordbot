@@ -29,8 +29,6 @@ init {
             return
         }
         val args = event?.args?.replace("　"," ")?.split(" ")?.toList()
-        event?.reply(args.toString())
-
         if (args?.size!! >1) {
             val embed = EmbedBuilder().setTitle(args[0])
             for (i in 1..args.size-1) {

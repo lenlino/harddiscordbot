@@ -20,7 +20,7 @@ init {
 }
     override fun execute(event: CommandEvent?){
 /*executeメソッドはコマンドを叩かれたイベントをキャッチして対応する処理を実行する中核部分です*/
-        if (event!!.isOwner) {
+        if (event!!.guild.ownerIdLong==event.member.idLong) {
             val conn = getConnection()
             val psts = conn?.prepareStatement("SELECT * FROM discord WHERE server_id = ?")
             psts?.setString(1, event?.guild?.id)

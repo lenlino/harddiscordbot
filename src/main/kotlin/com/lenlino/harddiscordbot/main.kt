@@ -14,6 +14,7 @@ import java.awt.Color
 import java.net.URI
 import java.net.URISyntaxException
 import java.sql.*
+import java.util.function.Consumer
 
 
 class Neko:Command(){/*Commandクラスを継承してコマンドを定義*/
@@ -67,6 +68,9 @@ init {
             .addField("gcset","グローバルチャットを設定",false)
             .addField("poll <タイトル> <項目１> <項目２>...","投票を設定(new!)",false)
             .addField("pollr <投票ID>","投票結果をグラフで表示(new!)",false)
+            .addField("about","BOTの情報を表示(new!)",false)
+            .addField("omikuji","おみくじ(new!)",false)
+            .addField("dice","サイコロ 1から6(new!)",false)
             .build() //buildは一番最後の組み立て処理です。書き忘れないようにしましょう。
         event?.reply(embed)
 /*
@@ -91,7 +95,7 @@ class BotClient: ListenerAdapter(){
         val commandClient = CommandClientBuilder()
             .setPrefix(commandPrefix)
             .setOwnerId("") /*本来であれば開発者のIDを入れますが、空文字列でもOKです。*/
-            .addCommands(Neko(),kick(),help(),about(),mcskin(),gcset(),poll(),pollresult())
+            .addCommands(Neko(),kick(),help(),about(),mcskin(),gcset(),poll(),pollresult(),mcserver(),omikuzi(),dice())
             .useHelpBuilder(false)
             .build()
 
