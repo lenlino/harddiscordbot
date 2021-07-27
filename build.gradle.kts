@@ -30,6 +30,8 @@ dependencies {
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
     implementation("net.dv8tion:JDA:4.3.0_277")
     implementation("com.jagrosh:jda-utilities:3.0.5")
+    implementation("com.sedmelluq:lavaplayer:1.3.73")
+    implementation("com.ibm.watson:ibm-watson:9.2.0")
 }
 
 tasks.getByName<Test>("test") {

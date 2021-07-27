@@ -3,18 +3,25 @@ package com.lenlino.harddiscordbot
 import com.jagrosh.jdautilities.command.Command
 import com.jagrosh.jdautilities.command.CommandClientBuilder
 import com.jagrosh.jdautilities.command.CommandEvent
+import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager
+import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager
+import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.JDABuilder
+import net.dv8tion.jda.api.entities.Guild
+import net.dv8tion.jda.api.entities.VoiceChannel
 import net.dv8tion.jda.api.events.ReadyEvent
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
+import net.dv8tion.jda.api.managers.AudioManager
 import net.dv8tion.jda.api.requests.GatewayIntent
-import java.awt.Color
+import net.dv8tion.jda.api.utils.cache.CacheFlag
+import org.json.JSONObject
 import java.net.URI
 import java.net.URISyntaxException
+import java.net.URL
 import java.sql.*
-import java.util.function.Consumer
 
 
 class Neko:Command(){/*Commandクラスを継承してコマンドを定義*/
@@ -92,14 +99,16 @@ class BotClient: ListenerAdapter(){
 
     fun main(token: String) {
 
+
+
         val commandClient = CommandClientBuilder()
             .setPrefix(commandPrefix)
             .setOwnerId("") /*本来であれば開発者のIDを入れますが、空文字列でもOKです。*/
-            .addCommands(Neko(),kick(),help(),about(),mcskin(),gcset(),poll(),pollresult(),mcserver(),omikuzi(),dice())
+            .addCommands(Neko(),kick(),help(),about(),mcskin(),gcset(),poll(),pollresult(),mcserver(),omikuzi(),dice(),omikujiset())
             .useHelpBuilder(false)
             .build()
 
-        jda = JDABuilder.createLight(token,
+        jda = JDABuilder.createDefault(token,
             GatewayIntent.GUILD_MESSAGES)
             .addEventListeners(commandClient)
             .addEventListeners(this)
@@ -109,6 +118,8 @@ class BotClient: ListenerAdapter(){
     }
 
     override fun onReady(event: ReadyEvent) { //Botがログインしたときの処理
+        val playerManager: AudioPlayerManager = DefaultAudioPlayerManager()
+        AudioSourceManagers.registerRemoteSources(playerManager)
         println("起動しました")
     }
 
@@ -122,13 +133,21 @@ class BotClient: ListenerAdapter(){
             val rs: ResultSet = psts.executeQuery()
 
             while (rs.next()) {
+                //送信元チャンネルが登録されているか確認
                 if(rs.getString("gchannel_id").equals(event.channel.id)) {
                     val rs = stmt.executeQuery("SELECT * FROM discord")
                     while (rs.next()) {
+                        //送信元チャンネルではないことを確認
                         if (!rs.getString("gchannel_id").equals(event.channel.id)) {
                             val guild = jda.getGuildById(rs.getString("server_id"))
                             val channel = guild?.getTextChannelById(rs.getString("gchannel_id"))
                             channel?.sendMessage(event.member!!.effectiveName + " » " + event.message.contentDisplay)?.queue()
+                            if (event.message.attachments.size>0) {
+                                val imagelist = event.message.attachments
+                                for (i in 0..imagelist.size-1) {
+                                    channel?.sendMessage(imagelist[i].url)?.queue()
+                                }
+                            }
                         }
                     }
                 }
@@ -137,22 +156,19 @@ class BotClient: ListenerAdapter(){
             psts.close()
             conn.close()
         }
-
-    }
-}
-
+}}
 
 
 fun main() {
     val token = System.getenv("Discord_Bot_Token")
     val bot = BotClient()
-    bot.main(token)
+    bot.main("ODYwODI3MTc0NTQxNzIxNjAw.YOA5xw.34U3a0EhGAEwtjR4wzfNUFq1Il8")
 }
 
 @Throws(URISyntaxException::class, SQLException::class)
 fun getConnection(): Connection? {
     val url = System.getenv("DATABASE_URL")
-    val dbUri = URI(url)
+    val dbUri = URI("postgres://mworjrysfgogtj:3cc9bdd05a443c5ee531ddcfd7b9f69d9f0e53777de1b43d1e8bc6986c4e2518@ec2-54-147-93-73.compute-1.amazonaws.com:5432/dtu6tgi7mj8rv")
     val username: String = dbUri.getUserInfo().split(":").get(0)
     val password: String = dbUri.getUserInfo().split(":").get(1)
     val dbUrl = "jdbc:postgresql://" + dbUri.getHost() + dbUri.getPath()
