@@ -162,13 +162,13 @@ class BotClient: ListenerAdapter(){
 fun main() {
     val token = System.getenv("Discord_Bot_Token")
     val bot = BotClient()
-    bot.main("ODYwODI3MTc0NTQxNzIxNjAw.YOA5xw.34U3a0EhGAEwtjR4wzfNUFq1Il8")
+    bot.main(token)
 }
 
 @Throws(URISyntaxException::class, SQLException::class)
 fun getConnection(): Connection? {
     val url = System.getenv("DATABASE_URL")
-    val dbUri = URI("postgres://mworjrysfgogtj:3cc9bdd05a443c5ee531ddcfd7b9f69d9f0e53777de1b43d1e8bc6986c4e2518@ec2-54-147-93-73.compute-1.amazonaws.com:5432/dtu6tgi7mj8rv")
+    val dbUri = URI(url)
     val username: String = dbUri.getUserInfo().split(":").get(0)
     val password: String = dbUri.getUserInfo().split(":").get(1)
     val dbUrl = "jdbc:postgresql://" + dbUri.getHost() + dbUri.getPath()
