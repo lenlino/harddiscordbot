@@ -98,7 +98,7 @@ class mcbeskin: Command() {
                             .build()
                         event?.reply(embed)
                     } else {
-                        event?.reply("GeyserMCのサーバー上にデータがありません。(GeyserMCが導入されているサーバーに入るとスキンが登録されるはず..)")
+                        event?.reply("GeyserMCのサーバー上にデータがありません。(GeyserMCが導入されているサーバーに入るとスキンが登録されます)")
                     }
                 } else {
                     event?.reply("ユーザーが存在しません")
