@@ -69,15 +69,17 @@ init {
 
             .appendDescription("すべてのコマンドの前には.をつける必要があります") //Embedの説明文
             .setColor(0x00ff00) //Embed左端の色を設定します。今回は緑。
+            .addField("about","BOTの導入数・BOT招待URLを表示",false)
             .addField("neko","にゃー",false) //以下3つフィールドをセット
             .addField("mcserver <サーバーアドレス>","minecraftサーバーステータスを取得",false)
             .addField("mcskin <ユーザー名>","minecraftスキンを取得",false)
+            .addField("mcbeskin <ユーザー名>","minecraft(BE)スキンを取得",false)
             .addField("gcset","グローバルチャットを設定",false)
-            .addField("poll <タイトル> <項目１> <項目２>...","投票を設定(new!)",false)
-            .addField("pollr <投票ID>","投票結果をグラフで表示(new!)",false)
-            .addField("about","BOTの情報を表示(new!)",false)
-            .addField("omikuji","おみくじ(new!)",false)
-            .addField("dice","サイコロ 1から6(new!)",false)
+            .addField("poll <タイトル> <項目１> <項目２>...","投票を設定",false)
+            .addField("pollr <投票ID>","投票結果をグラフで表示",false)
+            .addField("omikuji","おみくじ",false)
+            .addField("dice","サイコロ 1から6",false)
+            .addField("vc","読み上げの開始/停止(新機能)",false)
             .build() //buildは一番最後の組み立て処理です。書き忘れないようにしましょう。
         event?.reply(embed)
 /*
@@ -104,7 +106,7 @@ class BotClient: ListenerAdapter(){
         val commandClient = CommandClientBuilder()
             .setPrefix(commandPrefix)
             .setOwnerId("") /*本来であれば開発者のIDを入れますが、空文字列でもOKです。*/
-            .addCommands(Neko(),kick(),help(),about(),mcskin(),gcset(),poll(),pollresult(),mcserver(),omikuzi(),dice(),omikujiset())
+            .addCommands(Neko(),kick(),help(),about(),mcskin(),gcset(),poll(),pollresult(),mcserver(),omikuzi(),dice(),omikujiset(),mcbeskin())
             .useHelpBuilder(false)
             .build()
 

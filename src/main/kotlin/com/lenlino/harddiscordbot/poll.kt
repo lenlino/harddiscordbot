@@ -36,23 +36,25 @@ init {
             }
             embed.setColor(Color.PINK)
             embed.setAuthor(event.member.effectiveName,null,event.member.user.effectiveAvatarUrl)
+            embed.addField("グラフで結果を表示:arrow_down:","",false)
             //リアクション追加
             event.channel.sendMessage(embed.build()).queue(({ t: Message? ->
                 for (i in 0..args.size-2) {
                     t?.addReaction(alphabed[i])?.queue()
                 }
-                event.reply("結果を画像出力:arrow_down:")
                 event.reply(".pollr " + t?.id)
             }))
 
         } else if (args?.size == 1) {
-            val embed = EmbedBuilder().setTitle(event.args[0].toString())
+            val embed = EmbedBuilder().setTitle(event.args.toString())
                 .setDescription("⭕\n❌")
                 .setAuthor(event.member.effectiveName,null,event.member.user.effectiveAvatarUrl)
+                .addField("グラフで結果を表示:arrow_down:","",false)
                 .build()
-            event.channel.sendMessage(embed).queue(({ message -> message.addReaction("⭕").queue()
+            event.channel.sendMessage(embed)
+
+                .queue(({ message -> message.addReaction("⭕").queue()
             message.addReaction("❌").queue()
-            event.reply("グラフで結果を表示")
             event.reply(".pollr " + message.id)}))
         } else if (args?.size == 0){
             event.channel.sendMessage("タイトルを指定してください")

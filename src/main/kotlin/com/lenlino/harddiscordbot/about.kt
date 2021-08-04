@@ -7,10 +7,7 @@ import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 import org.json.JSONString
-import java.io.BufferedReader
-import java.io.IOException
-import java.io.InputStreamReader
-import java.io.Reader
+import java.io.*
 import java.net.URL
 import java.nio.charset.Charset
 
@@ -75,6 +72,42 @@ class mcskin: Command() {
             }
         } else {
             event?.reply("ユーザー名/UUIDを入力してください")
+        }
+    }
+}
+
+class mcbeskin: Command() {
+    init {
+        this.name = "mcbeskin"
+    }
+
+    override fun execute(event: CommandEvent?) {
+        //https://github.com/crafatar/crafatar/issues/287を参考に作成
+        if(event?.args?.isEmpty()==false) {
+            //APIよりゲーマタグからxuid取得
+            try {
+                val xuid = readJsonFromUrl("https://xbl-api.prouser123.me/xuid/" + event.args)
+                if (!xuid.has("error")) {
+                    //GeyserMCサーバーよりテクスチャIDを取得
+                    val id = readJsonFromUrl("https://api.geysermc.org/v1/skin/"+xuid.getString("xuid"))
+                    if (id.getJSONObject("data").length()!=0){
+                        val embed = EmbedBuilder()
+                            .setTitle(event?.args)
+                            .setImage("http://textures.minecraft.net/texture/"+id.getJSONObject("data").getString("texture_id"))
+                            .setFooter("body画像製作中")
+                            .build()
+                        event?.reply(embed)
+                    } else {
+                        event?.reply("GeyserMCのサーバー上にデータがありません。(GeyserMCが導入されているサーバーに入るとスキンが登録されるはず..)")
+                    }
+                } else {
+                    event?.reply("ユーザーが存在しません")
+                }
+            } catch (e: FileNotFoundException) {
+                event?.reply("ユーザーが存在しません")
+            }
+        } else {
+            event?.reply("ユーザー名を入力してください")
         }
     }
 }
