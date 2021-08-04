@@ -9,6 +9,7 @@ import org.json.JSONObject
 import org.json.JSONString
 import java.io.*
 import java.net.URL
+import java.net.URLConnection
 import java.nio.charset.Charset
 
 
@@ -124,9 +125,10 @@ private fun readAll(rd: Reader): String {
 
 @Throws(IOException::class, JSONException::class)
 fun readJsonFromUrl(url: String?): JSONObject {
-    val `is` = URL(url).openStream()
+    val conn: URLConnection = URL(url).openConnection()
     return try {
-        val rd = BufferedReader(InputStreamReader(`is`, Charset.forName("UTF-8")))
+        conn.setRequestProperty("User-agent", "Mozilla / 5.0")
+        val rd = BufferedReader(InputStreamReader(conn.getInputStream(), Charset.forName("UTF-8")))
         val jsonText = readAll(rd)
         if (jsonText.isEmpty()) {
             val emptyjson = "{null:true}"
@@ -134,9 +136,8 @@ fun readJsonFromUrl(url: String?): JSONObject {
         } else {
             JSONObject(jsonText)
         }
-
     } finally {
-        `is`.close()
+        conn.getInputStream().close()
     }
 }
 
