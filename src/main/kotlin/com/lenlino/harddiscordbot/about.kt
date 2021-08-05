@@ -94,8 +94,8 @@ class mcbeskin: Command() {
                     if (id.getJSONObject("data").length()!=0){
                         val embed = EmbedBuilder()
                             .setTitle(event?.args)
-                            .setImage("http://textures.minecraft.net/texture/"+id.getJSONObject("data").getString("texture_id"))
-                            .setFooter("body画像製作中")
+                            .setImage("https://mc-heads.net/player/"+id.getJSONObject("data").getString("texture_id"))
+                            .setThumbnail("http://textures.minecraft.net/texture/"+id.getJSONObject("data").getString("texture_id"))
                             .build()
                         event?.reply(embed)
                     } else {
