@@ -15,26 +15,10 @@ class omikuzi: Command() {
 
     override fun execute(event: CommandEvent?) {
         val contexts: List<String> = Arrays.asList("大吉","中吉","小吉","吉","末吉","凶","大凶")
-        val conn = getConnection()
-        val stmt: Statement = conn!!.createStatement()
-        val psts: PreparedStatement = conn.prepareStatement("SELECT * FROM discord WHERE server_id=? AND omikuji_contents IS NOT NULL")
-        psts.setString(1, event?.guild?.id);
-        val rs: ResultSet = psts.executeQuery()
-        if (rs.next()) {
-            val omikuji_contents: List<String> = rs.getString("omikuji_contents").split(",").toList()
-            val random = (0..6).random()
-            val embed = EmbedBuilder()
-                .setTitle(contexts[random])
-                .setDescription(omikuji_contents[random])
-                .build()
-            event?.reply(embed)
-        } else {
-            val embed = EmbedBuilder()
-                .setTitle(contexts[(0..6).random()])
-                .build()
-            event?.reply(embed)
-        }
-        conn.close()
+        val embed = EmbedBuilder()
+            .setTitle(contexts[(0..6).random()])
+            .build()
+        event?.reply(embed)
     }
 }
 class dice: Command() {

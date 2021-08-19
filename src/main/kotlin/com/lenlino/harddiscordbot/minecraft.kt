@@ -12,6 +12,54 @@ import java.net.URL
 import java.net.URLConnection
 import java.nio.charset.Charset
 
+class uuid: Command(){
+    init {
+        this.name="uuid"
+    }
+
+    override fun execute(event: CommandEvent?) {
+        val api = readJsonFromUrl("https://api.mojang.com/users/profiles/minecraft/"+event?.args)
+        if (!api.has("null")) {
+            val embed = EmbedBuilder()
+                .setTitle(api.getString("name"))
+                .setFooter(api.getString("id"))
+                .build()
+            event?.reply(embed)
+        } else {
+            event?.reply("ユーザーが存在しません")
+        }
+    }
+}
+
+class xuid: Command(){
+    init {
+        this.name="xuid"
+    }
+
+    override fun execute(event: CommandEvent?) {
+        if(event?.args?.isEmpty()==false) {
+            //APIよりゲーマタグからxuid取得
+            try {
+                val xuid = readJsonFromUrl("https://xbl-api.prouser123.me/xuid/" + event.args)
+                if (!xuid.has("error")) {
+                    //GeyserMCサーバーよりテクスチャIDを取得
+                    val id = xuid.getString("xuid")
+                    val embed = EmbedBuilder()
+                        .setTitle(event.args)
+                        .addField("xuid",id,false)
+                        .build()
+                    event.reply(embed)
+                } else {
+                    event?.reply("ユーザーが存在しません")
+                }
+            } catch (e: FileNotFoundException) {
+                event?.reply("ユーザーが存在しません")
+            }
+        } else {
+            event?.reply("ユーザー名を入力してください")
+        }
+    }
+}
 
 class mcserver: Command(){
     init {
