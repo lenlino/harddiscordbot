@@ -128,13 +128,18 @@ class BotClient: ListenerAdapter(){
             while (rs.next()) {
                 //送信元チャンネルが登録されているか確認
                 if(rs.getString("gchannel_id").equals(event.channel.id)) {
+                    val embed = EmbedBuilder()
+                        .setColor(Color.PINK)
+                        .setAuthor(event.member?.effectiveName,"https://discordapp.com/users/"+event.member?.id,event.member?.user?.effectiveAvatarUrl)
+                        .appendDescription(event.message.contentDisplay)
+                        .build()
                     val rs = stmt.executeQuery("SELECT * FROM discord")
                     while (rs.next()) {
                         //送信元チャンネルではないことを確認
                         if (!rs.getString("gchannel_id").equals(event.channel.id)) {
                             val guild = jda.getGuildById(rs.getString("server_id"))
                             val channel = guild?.getTextChannelById(rs.getString("gchannel_id"))
-                            channel?.sendMessage(event.member!!.effectiveName + " » " + event.message.contentDisplay)?.queue()
+                            channel?.sendMessage(embed)?.queue()
                             if (event.message.attachments.size>0) {
                                 val imagelist = event.message.attachments
                                 for (i in 0..imagelist.size-1) {
