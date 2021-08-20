@@ -9,19 +9,16 @@ import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.JDABuilder
-import net.dv8tion.jda.api.entities.Guild
-import net.dv8tion.jda.api.entities.VoiceChannel
 import net.dv8tion.jda.api.events.ReadyEvent
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
-import net.dv8tion.jda.api.managers.AudioManager
 import net.dv8tion.jda.api.requests.GatewayIntent
-import net.dv8tion.jda.api.utils.cache.CacheFlag
-import org.json.JSONObject
 import java.net.URI
 import java.net.URISyntaxException
-import java.net.URL
 import java.sql.*
+import java.text.SimpleDateFormat
+import java.util.*
+import java.util.Date
 
 
 class Neko:Command(){/*Commandクラスを継承してコマンドを定義*/
@@ -108,7 +105,7 @@ class BotClient: ListenerAdapter(){
         val commandClient = CommandClientBuilder()
             .setPrefix(commandPrefix)
             .setOwnerId("") /*本来であれば開発者のIDを入れますが、空文字列でもOKです。*/
-            .addCommands(Neko(),kick(),help(),about(),mcskin(),gcset(),poll(),pollresult(),mcserver(),omikuzi(),dice(),omikujiset(),mcbeskin(),eewset(),uuid(),xuid())
+            .addCommands(covidset(),Neko(),kick(),help(),about(),mcskin(),gcset(),poll(),pollresult(),mcserver(),omikuzi(),dice(),omikujiset(),mcbeskin(),eewset(),uuid(),xuid())
             .useHelpBuilder(false)
             .build()
 
@@ -121,9 +118,12 @@ class BotClient: ListenerAdapter(){
 
     }
 
+
+
     override fun onReady(event: ReadyEvent) { //Botがログインしたときの処理
         val playerManager: AudioPlayerManager = DefaultAudioPlayerManager()
         AudioSourceManagers.registerRemoteSources(playerManager)
+        covidtimer(event.jda)
         println("起動しました")
     }
 
@@ -160,6 +160,7 @@ class BotClient: ListenerAdapter(){
             psts.close()
             conn.close()
         }
+
 }}
 
 
@@ -167,6 +168,7 @@ fun main() {
     val token = System.getenv("Discord_Bot_Token")
     val bot = BotClient()
     bot.main(token)
+
 }
 
 @Throws(URISyntaxException::class, SQLException::class)
