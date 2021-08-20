@@ -13,6 +13,8 @@ import net.dv8tion.jda.api.events.ReadyEvent
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 import net.dv8tion.jda.api.requests.GatewayIntent
+import java.awt.Color
+import java.io.IOException
 import java.net.URI
 import java.net.URISyntaxException
 import java.sql.*
@@ -21,33 +23,22 @@ import java.util.*
 import java.util.Date
 
 
-class Neko:Command(){/*Commandクラスを継承してコマンドを定義*/
+class Neko:Command(){
 init {
-    this.name = "neko" /*コマンド文字列の定義はinitブロックの中に書く必要があります。*/
+    this.name = "neko"
 }
     override fun execute(event: CommandEvent?){
-/*executeメソッドはコマンドを叩かれたイベントをキャッチして対応する処理を実行する中核部分です*/
-        event?.reply("にゃーん")
-/*
-ここで使われているreplyメソッドは
-event?.message?.channel?.sendMessageFormat("")?.queue()
-の簡易呼び出しです。Discordの「返信」とは異なりますのでご注意ください。
-*/
-    }
-}
-
-class kick:Command(){/*Commandクラスを継承してコマンドを定義*/
-init {
-    this.name = "kick" /*コマンド文字列の定義はinitブロックの中に書く必要があります。*/
-}
-    override fun execute(event: CommandEvent?){
-/*executeメソッドはコマンドを叩かれたイベントをキャッチして対応する処理を実行する中核部分です*/
-        event!!.reply("test")
-/*
-ここで使われているreplyメソッドは
-event?.message?.channel?.sendMessageFormat("")?.queue()
-の簡易呼び出しです。Discordの「返信」とは異なりますのでご注意ください。
-*/
+        val embed = EmbedBuilder().setColor(Color.PINK)
+        try {
+            val url = readJsonFromUrl("https://aws.random.cat/meow").getString("file")
+            embed.setImage(url)
+                .setAuthor("random.cat","https://aws.random.cat/view/876")
+        } catch (e: IOException) {
+            val url = readJsonFromUrl("https://api.thecatapi.com/v1/images/search").getString("url")
+            embed.setImage(url)
+                .setAuthor("thecatapi","https://thecatapi.com/")
+        }
+        event?.reply(embed.build())
     }
 }
 
@@ -65,7 +56,7 @@ init {
             //今回は自分のアバターアイコンを指定しました。
 
             .appendDescription("すべてのコマンドの前には.をつける必要があります") //Embedの説明文
-            .setColor(0x00ff00) //Embed左端の色を設定します。今回は緑。
+            .setColor(Color.PINK) //Embed左端の色を設定します。今回は緑。
             .addField("about","BOTの導入数・BOT招待URLを表示",false)
             .addField("neko","にゃー",false) //以下3つフィールドをセット
             .addField("mcserver <サーバーアドレス>","minecraftサーバーステータスを取得",false)
@@ -94,9 +85,7 @@ event?.message?.channel?.sendMessageFormat("")?.queue()
 class BotClient: ListenerAdapter(){
 
     lateinit var jda: JDA
-    private val commandPrefix = "." /*コマンドプレフィックスの指定
-                                     空文字列にするとBotへのメンションがプレフィックスとして機能します。
-　　　　　　　　　　　　　　　　　　　　このほうがいいかも。*/
+    private val commandPrefix = "."
 
     fun main(token: String) {
 
@@ -104,8 +93,8 @@ class BotClient: ListenerAdapter(){
 
         val commandClient = CommandClientBuilder()
             .setPrefix(commandPrefix)
-            .setOwnerId("") /*本来であれば開発者のIDを入れますが、空文字列でもOKです。*/
-            .addCommands(covidset(),Neko(),kick(),help(),about(),mcskin(),gcset(),poll(),pollresult(),mcserver(),omikuzi(),dice(),omikujiset(),mcbeskin(),eewset(),uuid(),xuid())
+            .setOwnerId("")
+            .addCommands(covidset(),Neko(),help(),about(),mcskin(),gcset(),poll(),pollresult(),mcserver(),omikuzi(),dice(),omikujiset(),mcbeskin(),eewset(),uuid(),xuid())
             .useHelpBuilder(false)
             .build()
 

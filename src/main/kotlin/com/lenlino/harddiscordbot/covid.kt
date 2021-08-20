@@ -49,7 +49,8 @@ class covidset: Command() {
             psts?.close()
             conn?.close()
         } else {
-            event.reply("このコマンドはサーバー管理者のみが実行できます")
+            val embed = EmbedBuilder().setColor(Color.RED).setTitle("このコマンドはサーバー管理者のみが実行できます").build()
+            event.reply(embed)
         }
     }
 }
@@ -89,6 +90,9 @@ fun covidtimer(jda: JDA) {
         }
     }
     val date = Date()
+    if (date.hours>=19 && date.minutes>0) {
+        date.setDate(date.getDate()+1)
+    }
     date.setHours(19)
     date.setMinutes(0)
     date.setSeconds(0)
