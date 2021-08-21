@@ -130,7 +130,7 @@ class BotClient: ListenerAdapter(){
                 if(rs.getString("gchannel_id").equals(event.channel.id)) {
                     val embed = EmbedBuilder()
                         .setColor(Color.PINK)
-                        .setAuthor(event.member?.user?.name,"",event.member?.user?.effectiveAvatarUrl)
+                        .setAuthor(event.member?.user?.name,null,event.member?.user?.effectiveAvatarUrl)
                         .appendDescription(event.message.contentDisplay)
                         .setFooter(event.guild.name,event.guild.iconUrl)
                     val rs = stmt.executeQuery("SELECT * FROM discord")
