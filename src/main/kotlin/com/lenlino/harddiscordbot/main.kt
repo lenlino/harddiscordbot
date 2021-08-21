@@ -34,9 +34,8 @@ init {
             embed.setImage(url)
                 .setAuthor("random.cat","https://aws.random.cat/view/876")
         } catch (e: IOException) {
-            val url = readJsonFromUrl("https://api.thecatapi.com/v1/images/search").getString("url")
-            embed.setImage(url)
-                .setAuthor("thecatapi","https://thecatapi.com/")
+            embed.setColor(Color.RED)
+                .setTitle("アクセス制限により取得できません。再度、実行してください。")
         }
         event?.reply(embed.build())
     }
@@ -94,7 +93,7 @@ class BotClient: ListenerAdapter(){
         val commandClient = CommandClientBuilder()
             .setPrefix(commandPrefix)
             .setOwnerId("")
-            .addCommands(covidset(),Neko(),help(),about(),mcskin(),gcset(),poll(),pollresult(),mcserver(),omikuzi(),dice(),omikujiset(),mcbeskin(),eewset(),uuid(),xuid())
+            .addCommands(covidset(),Neko(),help(),about(),mcskin(),gcset(),poll(),pollresult(),mcserver(),omikuzi(),dice(),mcbeskin(),eewset(),uuid(),xuid())
             .useHelpBuilder(false)
             .build()
 
@@ -130,7 +129,7 @@ class BotClient: ListenerAdapter(){
                 if(rs.getString("gchannel_id").equals(event.channel.id)) {
                     val embed = EmbedBuilder()
                         .setColor(Color.PINK)
-                        .setAuthor(event.member?.user?.name)
+                        .setTitle(event.member?.user?.name)
                         .setThumbnail(event.member?.user?.effectiveAvatarUrl)
                         .appendDescription(event.message.contentDisplay)
                         .setFooter(event.guild.name,event.guild.iconUrl)

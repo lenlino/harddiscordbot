@@ -7,6 +7,7 @@ import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 import org.json.JSONString
+import java.awt.Color
 import java.io.*
 import java.net.URL
 import java.net.URLConnection
@@ -23,10 +24,11 @@ class uuid: Command(){
             val embed = EmbedBuilder()
                 .setTitle(api.getString("name"))
                 .setFooter(api.getString("id"))
+                .setColor(Color.PINK)
                 .build()
             event?.reply(embed)
         } else {
-            event?.reply("ユーザーが存在しません")
+            nouserembed(event)
         }
     }
 }
@@ -47,16 +49,21 @@ class xuid: Command(){
                     val embed = EmbedBuilder()
                         .setTitle(event.args)
                         .addField("xuid",id,false)
+                        .setColor(Color.PINK)
                         .build()
                     event.reply(embed)
                 } else {
-                    event?.reply("ユーザーが存在しません")
+                    nouserembed(event)
                 }
             } catch (e: FileNotFoundException) {
-                event?.reply("ユーザーが存在しません")
+                nouserembed(event)
             }
         } else {
-            event?.reply("ユーザー名を入力してください")
+            val embed = EmbedBuilder()
+                .setTitle("ユーザー名を入力してください")
+                .setColor(Color.RED)
+                .build()
+            event?.reply(embed)
         }
     }
 }
@@ -80,6 +87,7 @@ class mcserver: Command(){
                     .addField("プレーヤー数",players.getInt("online").toString()+"/"+players.getInt("max").toString(),false)
                     .addField("MOTD",motd.getJSONArray("clean").toString(),false)
                     .setThumbnail("https://api.mcsrvstat.us/icon/" + event.args)
+                    .setColor(Color.PINK)
                     .build()
                 event?.reply(embed)
 
@@ -87,14 +95,18 @@ class mcserver: Command(){
                 val embed = EmbedBuilder()
                     .setTitle("サーバー情報")
                     .appendDescription("サーバーはオフラインです")
+                    .setColor(Color.RED)
                     .build()
                 event?.reply(embed)
             }
 
         } else {
-            event?.reply("サーバーipを入力してください")
+            val embed = EmbedBuilder()
+                .setTitle("サーバーアドレスを入力してください")
+                .setColor(Color.RED)
+                .build()
+            event?.reply(embed)
         }
-
     }
 
 
@@ -114,13 +126,18 @@ class mcskin: Command() {
                     .setTitle(api.getString("name"))
                     .setThumbnail("https://crafatar.com/skins/"+api.getString("id"))
                     .setImage("https://crafatar.com/renders/body/"+api.getString("id"))
+                    .setColor(Color.PINK)
                     .build()
                 event?.reply(embed)
             } else {
-                event?.reply("ユーザーが存在しません")
+                nouserembed(event)
             }
         } else {
-            event?.reply("ユーザー名/UUIDを入力してください")
+            val embed = EmbedBuilder()
+                .setTitle("ユーザー名を入力してください")
+                .setColor(Color.RED)
+                .build()
+            event?.reply(embed)
         }
     }
 }
@@ -144,19 +161,29 @@ class mcbeskin: Command() {
                             .setTitle(event?.args)
                             .setImage("https://mc-heads.net/player/"+id.getJSONObject("data").getString("texture_id"))
                             .setThumbnail("http://textures.minecraft.net/texture/"+id.getJSONObject("data").getString("texture_id"))
+                            .setColor(Color.PINK)
                             .build()
                         event?.reply(embed)
                     } else {
-                        event?.reply("GeyserMCのサーバー上にデータがありません。(GeyserMCが導入されているサーバーに入るとスキンが登録されます)")
+                        val embed = EmbedBuilder()
+                            .setColor(Color.RED)
+                            .setTitle("GeyserMCのサーバー上にデータがありません。")
+                            .setDescription("GeyserMCが導入されているサーバーに入るとスキンが登録されます")
+                            .build()
+                        event?.reply(embed)
                     }
                 } else {
-                    event?.reply("ユーザーが存在しません")
+                    nouserembed(event)
                 }
             } catch (e: FileNotFoundException) {
-                event?.reply("ユーザーが存在しません")
+                nouserembed(event)
             }
         } else {
-            event?.reply("ユーザー名を入力してください")
+            val embed = EmbedBuilder()
+                .setTitle("ユーザー名を入力してください")
+                .setColor(Color.RED)
+                .build()
+            event?.reply(embed)
         }
     }
 }
@@ -200,9 +227,18 @@ class about: Command(){
             .setTitle("Info")
             .addField("サーバー導入数",event?.jda?.guilds?.size.toString(),false)
             .setAuthor("BOTの招待はこちらから！","https://discord.com/api/oauth2/authorize?client_id=860827174541721600&permissions=0&scope=bot")
+            .setColor(Color.PINK)
             .build()
         event?.reply(embed)
 
 
     }
+}
+
+fun nouserembed(event: CommandEvent?) {
+    val embed = EmbedBuilder()
+        .setTitle("ユーザーが存在しません")
+        .setColor(Color.RED)
+        .build()
+    event?.reply(embed)
 }
