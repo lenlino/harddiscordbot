@@ -4,6 +4,8 @@ import com.jagrosh.jdautilities.command.Command
 import com.jagrosh.jdautilities.command.CommandEvent
 import net.arnx.jsonic.JSON
 import net.dv8tion.jda.internal.requests.WebSocketClient
+import org.java_websocket.drafts.Draft
+import org.java_websocket.drafts.Draft_6455
 import org.java_websocket.handshake.ServerHandshake
 import java.net.URI
 import javax.net.ssl.SSLContext
@@ -40,5 +42,23 @@ class eewset: Command() {
         } else {
             event.reply("このコマンドはサーバー管理者のみが実行できます")
         }
+    }
+}
+
+class eew_websocket_client(uri: URI): org.java_websocket.client.WebSocketClient(uri) {
+    override fun onOpen(handshakedata: ServerHandshake?) {
+
+
+    }
+
+    override fun onClose(code: Int, reason: String?, remote: Boolean) {
+
+    }
+
+    override fun onMessage(message: String?) {
+    }
+
+    override fun onError(ex: Exception?) {
+
     }
 }

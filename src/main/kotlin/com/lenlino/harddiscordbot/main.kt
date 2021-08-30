@@ -3,6 +3,7 @@ package com.lenlino.harddiscordbot
 import com.jagrosh.jdautilities.command.Command
 import com.jagrosh.jdautilities.command.CommandClientBuilder
 import com.jagrosh.jdautilities.command.CommandEvent
+import com.jagrosh.jdautilities.commons.waiter.EventWaiter
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers
@@ -18,9 +19,6 @@ import java.io.IOException
 import java.net.URI
 import java.net.URISyntaxException
 import java.sql.*
-import java.text.SimpleDateFormat
-import java.util.*
-import java.util.Date
 
 
 class Neko:Command(){
@@ -34,8 +32,9 @@ init {
             embed.setImage(url)
                 .setAuthor("random.cat","https://aws.random.cat/view/876")
         } catch (e: IOException) {
-            embed.setColor(Color.RED)
-                .setTitle("アクセス制限により取得できません。再度、実行してください。")
+            val url = readJsonFromUrl("https://randomfox.ca/floof/").getString("image")
+            embed.setImage(url)
+                .setAuthor("randomfox.ca","https://randomfox.ca/")
         }
         event?.reply(embed.build())
     }
@@ -56,19 +55,22 @@ init {
 
             .appendDescription("すべてのコマンドの前には.をつける必要があります") //Embedの説明文
             .setColor(Color.PINK) //Embed左端の色を設定します。今回は緑。
-            .addField("about","BOTの導入数・BOT招待URLを表示",false)
-            .addField("neko","にゃー",false) //以下3つフィールドをセット
-            .addField("mcserver <サーバーアドレス>","minecraftサーバーステータスを取得",false)
-            .addField("mcskin <ユーザー名>","minecraftスキンを取得",false)
-            .addField("mcbeskin <ユーザー名>","minecraft(BE)スキンを取得(new)",false)
-            .addField("gcset","グローバルチャットを設定",false)
-            .addField("poll <タイトル> <項目１> <項目２>...","投票を設定",false)
-            .addField("pollr <投票ID>","投票結果をグラフで表示",false)
-            .addField("omikuji","おみくじ",false)
-            .addField("dice","サイコロ 1から6",false)
-            .addField("vc","読み上げの開始/停止",false)
-            .addField("uuid","uuidを取得",false)
-            .addField("xuid","xuidを取得",false)
+            .addField("about","BOTの導入数・BOT招待URLを表示",true)
+            .addField("neko","にゃー",true) //以下3つフィールドをセット
+            .addField("mcserver <サーバーアドレス>","minecraftサーバーステータスを取得",true)
+            .addField("mcskin <ユーザー名>","minecraftスキンを取得",true)
+            .addField("mcbeskin <ユーザー名>","minecraft(BE)スキンを取得(new)",true)
+            .addField("gcset","グローバルチャットを設定",true)
+            .addField("poll <タイトル> <項目１> <項目２>...","投票を設定",true)
+            .addField("pollr <投票ID>","投票結果をグラフで表示",true)
+            .addField("omikuji","おみくじ",true)
+            .addField("dice","サイコロ 1から6",true)
+            .addField("vc","読み上げの開始/停止",true)
+            .addField("uuid","uuidを取得",true)
+            .addField("xuid","xuidを取得",true)
+            .addField("vote","v",true)
+            .addField("del <ユーザ名> <削除する数>","指定ユーザーのメッセージを一括削除",true)
+            .addField("url <url>","urlのリダイレクト先を表示",true)
             .build() //buildは一番最後の組み立て処理です。書き忘れないようにしましょう。
         event?.reply(embed)
 /*
@@ -85,7 +87,9 @@ class BotClient: ListenerAdapter(){
 
     lateinit var jda: JDA
     private val commandPrefix = "."
-
+    companion object {
+        var waiter = EventWaiter()
+    }
     fun main(token: String) {
 
 
@@ -93,14 +97,14 @@ class BotClient: ListenerAdapter(){
         val commandClient = CommandClientBuilder()
             .setPrefix(commandPrefix)
             .setOwnerId("")
-            .addCommands(covidset(),Neko(),help(),about(),mcskin(),gcset(),poll(),pollresult(),mcserver(),omikuzi(),dice(),mcbeskin(),eewset(),uuid(),xuid())
+            .addCommands(covidset(),Neko(),help(),about(),mcskin(),gcset(),poll(),pollresult(),mcserver(),omikuzi(),dice(),mcbeskin(),uuid(),xuid(),del(),urlredirect())
             .useHelpBuilder(false)
             .build()
 
         jda = JDABuilder.createDefault(token,
             GatewayIntent.GUILD_MESSAGES)
             .addEventListeners(commandClient)
-            .addEventListeners(this)
+            .addEventListeners(this,waiter)
             .build()
 
 
@@ -115,13 +119,17 @@ class BotClient: ListenerAdapter(){
         println("起動しました")
     }
 
+    fun getEventWaiter(): EventWaiter? {
+        return waiter
+    }
+
     override fun onGuildMessageReceived(event : GuildMessageReceivedEvent) {
         //Botがメッセージを受信したときの処理
         if(!event.member?.user?.isBot!!){//メッセージ内容を確認
             val conn = getConnection()
             val stmt: Statement = conn!!.createStatement()
             val psts: PreparedStatement = conn.prepareStatement("SELECT * FROM discord WHERE server_id=?")
-            psts.setString(1, event?.guild?.id);
+            psts.setString(1, event.guild.id)
             val rs: ResultSet = psts.executeQuery()
 
             while (rs.next()) {
@@ -129,7 +137,7 @@ class BotClient: ListenerAdapter(){
                 if(rs.getString("gchannel_id").equals(event.channel.id)) {
                     val embed = EmbedBuilder()
                         .setColor(Color.PINK)
-                        .setTitle(event.member?.user?.name)
+                        .setTitle(event.member?.user?.asTag)
                         .setThumbnail(event.member?.user?.effectiveAvatarUrl)
                         .appendDescription(event.message.contentDisplay)
                         .setFooter(event.guild.name,event.guild.iconUrl)

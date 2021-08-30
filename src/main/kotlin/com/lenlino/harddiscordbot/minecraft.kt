@@ -177,6 +177,12 @@ class mcbeskin: Command() {
                 }
             } catch (e: FileNotFoundException) {
                 nouserembed(event)
+            } finally {
+                val embed= EmbedBuilder()
+                    .setColor(Color.RED)
+                    .setTitle("不明なエラーが発生しました")
+                    .build()
+                event?.reply(embed)
             }
         } else {
             val embed = EmbedBuilder()
