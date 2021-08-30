@@ -1,6 +1,7 @@
 package com.lenlino.harddiscordbot
 
 import com.google.common.base.Optional
+import com.google.common.collect.Interners.newBuilder
 import com.jagrosh.jdautilities.command.Command
 import com.jagrosh.jdautilities.command.CommandEvent
 import net.dv8tion.jda.api.EmbedBuilder
