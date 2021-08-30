@@ -38,8 +38,7 @@ dependencies {
     // https://mvnrepository.com/artifact/net.arnx/jsonic
     implementation("net.arnx:jsonic:1.3.10")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1-native-mt")
-
-
+    implementation( "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.5.30")
 }
 
 tasks.getByName<Test>("test") {
