@@ -164,6 +164,7 @@ class mcbeskin: Command() {
                             .setColor(Color.PINK)
                             .build()
                         event?.reply(embed)
+                        return
                     } else {
                         val embed = EmbedBuilder()
                             .setColor(Color.RED)
@@ -171,18 +172,15 @@ class mcbeskin: Command() {
                             .setDescription("GeyserMCが導入されているサーバーに入るとスキンが登録されます")
                             .build()
                         event?.reply(embed)
+
                     }
                 } else {
                     nouserembed(event)
+                    return
                 }
             } catch (e: FileNotFoundException) {
                 nouserembed(event)
-            } finally {
-                val embed= EmbedBuilder()
-                    .setColor(Color.RED)
-                    .setTitle("不明なエラーが発生しました")
-                    .build()
-                event?.reply(embed)
+                return
             }
         } else {
             val embed = EmbedBuilder()

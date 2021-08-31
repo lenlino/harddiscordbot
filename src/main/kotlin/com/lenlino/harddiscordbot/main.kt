@@ -55,29 +55,24 @@ init {
 
             .appendDescription("すべてのコマンドの前には.をつける必要があります") //Embedの説明文
             .setColor(Color.PINK) //Embed左端の色を設定します。今回は緑。
-            .addField("about","BOTの導入数・BOT招待URLを表示",true)
-            .addField("neko","にゃー",true) //以下3つフィールドをセット
-            .addField("mcserver <サーバーアドレス>","minecraftサーバーステータスを取得",true)
-            .addField("mcskin <ユーザー名>","minecraftスキンを取得",true)
-            .addField("mcbeskin <ユーザー名>","minecraft(BE)スキンを取得(new)",true)
-            .addField("gcset","グローバルチャットを設定",true)
-            .addField("poll <タイトル> <項目１> <項目２>...","投票を設定",true)
-            .addField("pollr <投票ID>","投票結果をグラフで表示",true)
-            .addField("omikuji","おみくじ",true)
-            .addField("dice","サイコロ 1から6",true)
-            .addField("vc","読み上げの開始/停止",true)
-            .addField("uuid","uuidを取得",true)
-            .addField("xuid","xuidを取得",true)
-            .addField("vote","v",true)
-            .addField("del <ユーザ名> <削除する数>","指定ユーザーのメッセージを一括削除",true)
-            .addField("url <url>","urlのリダイレクト先を表示",true)
+            .addField("about","BOTの導入数・BOT招待URLを表示",false)
+            .addField("neko","にゃー",false) //以下3つフィールドをセット
+            .addField("mcserver <サーバーアドレス>","minecraftサーバーステータスを取得",false)
+            .addField("mcskin <ユーザー名>","minecraftスキンを取得",false)
+            .addField("mcbeskin <ユーザー名>","minecraft(BE)スキンを取得(new)",false)
+            .addField("gcset","グローバルチャットを設定",false)
+            .addField("poll <タイトル> <項目１> <項目２>...","投票を設定",false)
+            .addField("pollr <投票ID>","投票結果をグラフで表示",false)
+            .addField("omikuji","おみくじ",false)
+            .addField("dice","サイコロ 1から6",false)
+            .addField("vc","読み上げの開始/停止",false)
+            .addField("uuid","uuidを取得",false)
+            .addField("xuid","xuidを取得",false)
+            .addField("vote","v",false)
+            .addField("del <ユーザ名> <削除する数>","指定ユーザーのメッセージを一括削除",false)
+            .addField("url <url>","urlのリダイレクト先を表示",false)
             .build() //buildは一番最後の組み立て処理です。書き忘れないようにしましょう。
         event?.reply(embed)
-/*
-ここで使われているreplyメソッドは
-event?.message?.channel?.sendMessageFormat("")?.queue()
-の簡易呼び出しです。Discordの「返信」とは異なりますのでご注意ください。
-*/
     }
 }
 
