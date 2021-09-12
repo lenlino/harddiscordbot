@@ -83,6 +83,7 @@ init {
             .addField("vote","v",false)
             .addField("del <ユーザ名> <削除する数>","指定ユーザーのメッセージを一括削除",false)
             .addField("url <url>","urlのリダイレクト先を表示",false)
+            .addField("urlcheck","危険URLの検出オン/オフ",false)
             .build() //buildは一番最後の組み立て処理です。書き忘れないようにしましょう。
         event?.reply(embed)
     }
