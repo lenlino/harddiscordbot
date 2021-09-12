@@ -193,7 +193,7 @@ class mcbeskin: Command() {
 }
 
 @Throws(IOException::class)
-private fun readAll(rd: Reader): String {
+fun readAll(rd: Reader): String {
     val sb = StringBuilder()
     var cp: Int
     while (rd.read().also { cp = it } != -1) {

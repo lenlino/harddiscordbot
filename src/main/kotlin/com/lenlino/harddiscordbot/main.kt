@@ -10,15 +10,27 @@ import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.JDABuilder
+import net.dv8tion.jda.api.entities.Message
+import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.events.ReadyEvent
+import net.dv8tion.jda.api.events.guild.GuildJoinEvent
+import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 import net.dv8tion.jda.api.requests.GatewayIntent
+import org.json.JSONObject
 import java.awt.Color
+import java.awt.SystemColor.text
+import java.io.BufferedReader
 import java.io.IOException
+import java.io.InputStreamReader
+import java.io.PrintStream
+import java.net.HttpURLConnection
 import java.net.URI
 import java.net.URISyntaxException
+import java.net.URL
 import java.sql.*
+import java.util.regex.Pattern
 
 
 class Neko:Command(){
@@ -92,12 +104,12 @@ class BotClient: ListenerAdapter(){
         val commandClient = CommandClientBuilder()
             .setPrefix(commandPrefix)
             .setOwnerId("")
-            .addCommands(covidset(),Neko(),help(),about(),mcskin(),gcset(),poll(),pollresult(),mcserver(),omikuzi(),dice(),mcbeskin(),uuid(),xuid(),del(),urlredirect())
+            .addCommands(urlchecksetting(),covidset(),Neko(),help(),about(),mcskin(),gcset(),poll(),pollresult(),mcserver(),omikuzi(),dice(),mcbeskin(),uuid(),xuid(),del(),urlredirect())
             .useHelpBuilder(false)
             .build()
 
         jda = JDABuilder.createDefault(token,
-            GatewayIntent.GUILD_MESSAGES)
+            GatewayIntent.GUILD_MESSAGES,GatewayIntent.GUILD_MEMBERS)
             .addEventListeners(commandClient)
             .addEventListeners(this,waiter)
             .build()
@@ -119,6 +131,16 @@ class BotClient: ListenerAdapter(){
     }
 
     override fun onGuildMessageReceived(event : GuildMessageReceivedEvent) {
+        if (dbcheck(event)) {
+            val regex = "(http://|https://){1}[\\w\\.\\-/:\\#\\?\\=\\&\\;\\%\\~\\+]+"
+            val urls = regex.toRegex(RegexOption.IGNORE_CASE).findAll(event.message.contentDisplay).map { it.value }
+            for (url in urls) {
+                urlcheck(url,event)
+            }
+        }
+        //URLCheck
+
+
         //Botがメッセージを受信したときの処理
         if(!event.member?.user?.isBot!!){//メッセージ内容を確認
             val conn = getConnection()
@@ -156,7 +178,81 @@ class BotClient: ListenerAdapter(){
             conn.close()
         }
 
-}}
+}
+    fun dbcheck(event: GuildMessageReceivedEvent): Boolean {
+        val conn = getConnection()
+        val psts = conn?.prepareStatement("SELECT * FROM discord WHERE server_id = ?")
+        psts?.setString(1, event?.guild?.id)
+        val rs = psts?.executeQuery()
+        try {
+            if (rs!!.next()) {
+                if (!rs.getBoolean("urlcheck")) {
+                    return false
+                }
+                return true
+            } else {
+                return false
+            }
+        } finally {
+            psts?.close()
+            conn?.close()
+        }
+    }
+
+    fun urlcheck(target_url: String, event: GuildMessageReceivedEvent): Boolean {
+        val url = URL("https://safebrowsing.googleapis.com/v4/threatMatches:find?key=AIzaSyBUsc2WXTu9O4kjdjnWrKwijLuR6E1AzoU")
+        val conn: HttpURLConnection = url.openConnection() as HttpURLConnection
+        val json = "  {\n" +
+                "    \"client\": {\n" +
+                "      \"clientId\":      \"yourcompanyname\",\n" +
+                "      \"clientVersion\": \"1.5.2\"\n" +
+                "    },\n" +
+                "    \"threatInfo\": {\n" +
+                "      \"threatTypes\":      [\"MALWARE\", \"SOCIAL_ENGINEERING\"],\n" +
+                "      \"platformTypes\":    [\"WINDOWS\"],\n" +
+                "      \"threatEntryTypes\": [\"URL\"],\n" +
+                "      \"threatEntries\": [\n" +
+                "     {\"url\": \""+target_url+"\"}\n" +
+                "      ]\n" +
+                "    }\n" +
+                "  }"
+
+        conn.setRequestMethod("POST")
+        conn.setRequestProperty("Content-Type", "application/json; charset=utf-8")
+        conn.setDoInput(true);
+        conn.setDoOutput(true);
+
+        conn.connect()
+
+        val ps = PrintStream(conn.outputStream)
+        ps.print(json)
+        ps.close()
+
+        if (conn.getResponseCode() != 200) {
+            //エラー処理
+        }
+
+        val br = BufferedReader(InputStreamReader(conn.inputStream, "UTF-8"))
+
+        val sb = readAll(br)
+        br.close()
+
+        if (JSONObject(sb).isNull("matches")) {
+            return true
+        }
+
+        val embed = EmbedBuilder()
+            .setTitle("URLは危険です！")
+            .setColor(Color.PINK)
+            .addField("Type",JSONObject(sb).getJSONArray("matches").getJSONObject(0).getString("threatType"),false)
+            .setFooter("Safe Browsing Lookup API")
+            .build()
+        event?.message.reply(embed).queue()
+        return false
+
+        //結果は呼び出し元に返しておく
+    }
+}
 
 
 fun main() {
