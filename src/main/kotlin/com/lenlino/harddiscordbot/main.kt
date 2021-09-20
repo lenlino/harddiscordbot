@@ -15,6 +15,7 @@ import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.events.ReadyEvent
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 import net.dv8tion.jda.api.requests.GatewayIntent
@@ -33,60 +34,51 @@ import java.sql.*
 import java.util.regex.Pattern
 
 
-class Neko:Command(){
-init {
-    this.name = "neko"
-}
-    override fun execute(event: CommandEvent?){
-        val embed = EmbedBuilder().setColor(Color.PINK)
-        try {
-            val url = readJsonFromUrl("https://aws.random.cat/meow").getString("file")
-            embed.setImage(url)
-                .setAuthor("random.cat","https://aws.random.cat/view/876")
-        } catch (e: IOException) {
-            val url = readJsonFromUrl("https://randomfox.ca/floof/").getString("image")
-            embed.setImage(url)
-                .setAuthor("randomfox.ca","https://randomfox.ca/")
-        }
-        event?.reply(embed.build())
+fun neko(event: SlashCommandEvent){
+    event.deferReply().queue()
+    val embed = EmbedBuilder().setColor(Color.PINK)
+    try {
+        val url = readJsonFromUrl("https://aws.random.cat/meow").getString("file")
+        embed.setImage(url)
+            .setAuthor("random.cat","https://aws.random.cat/view/876")
+    } catch (e: IOException) {
+        val url = readJsonFromUrl("https://randomfox.ca/floof/").getString("image")
+        embed.setImage(url)
+            .setAuthor("randomfox.ca","https://randomfox.ca/")
     }
+    event.hook.sendMessageEmbeds(embed.build()).queue()
 }
 
-class help:Command(){/*Commandクラスを継承してコマンドを定義*/
-init {
-    this.name = "help" /*コマンド文字列の定義はinitブロックの中に書く必要があります。*/
-}
-    override fun execute(event: CommandEvent?){
+fun help(event: CommandEvent?){
 /*executeメソッドはコマンドを叩かれたイベントをキャッチして対応する処理を実行する中核部分です*/
-        val embed = EmbedBuilder()//EmbedBuilderでインスタンスを作成して、後から中身をセットします。
-            //タイトル文字列。第2引数にURLを入れるとタイトルを指定URLへのリンクにできます
-            .setTitle("ヘルプ")
+    val embed = EmbedBuilder()//EmbedBuilderでインスタンスを作成して、後から中身をセットします。
+        //タイトル文字列。第2引数にURLを入れるとタイトルを指定URLへのリンクにできます
+        .setTitle("ヘルプ")
 
-            //Botの情報。タイトルと同じくリンクを指定できる他、第3引数にアイコン画像を指定できます。
-            //今回は自分のアバターアイコンを指定しました。
+        //Botの情報。タイトルと同じくリンクを指定できる他、第3引数にアイコン画像を指定できます。
+        //今回は自分のアバターアイコンを指定しました。
 
-            .appendDescription("すべてのコマンドの前には.をつける必要があります") //Embedの説明文
-            .setColor(Color.PINK) //Embed左端の色を設定します。今回は緑。
-            .addField("about","BOTの導入数・BOT招待URLを表示",false)
-            .addField("neko","にゃー",false) //以下3つフィールドをセット
-            .addField("mcserver <サーバーアドレス>","minecraftサーバーステータスを取得",false)
-            .addField("mcskin <ユーザー名>","minecraftスキンを取得",false)
-            .addField("mcbeskin <ユーザー名>","minecraft(BE)スキンを取得(new)",false)
-            .addField("gcset","グローバルチャットを設定",false)
-            .addField("poll <タイトル> <項目１> <項目２>...","投票を設定",false)
-            .addField("pollr <投票ID>","投票結果をグラフで表示",false)
-            .addField("omikuji","おみくじ",false)
-            .addField("dice","サイコロ 1から6",false)
-            .addField("vc","読み上げの開始/停止",false)
-            .addField("uuid","uuidを取得",false)
-            .addField("xuid","xuidを取得",false)
-            .addField("vote","v",false)
-            .addField("del <ユーザ名> <削除する数>","指定ユーザーのメッセージを一括削除",false)
-            .addField("url <url>","urlのリダイレクト先を表示",false)
-            .addField("urlcheck","危険URLの検出オン/オフ",false)
-            .build() //buildは一番最後の組み立て処理です。書き忘れないようにしましょう。
-        event?.reply(embed)
-    }
+        .appendDescription("すべてのコマンドの前には.をつける必要があります") //Embedの説明文
+        .setColor(Color.PINK) //Embed左端の色を設定します。今回は緑。
+        .addField("about","BOTの導入数・BOT招待URLを表示",false)
+        .addField("neko","にゃー",false) //以下3つフィールドをセット
+        .addField("mcserver <サーバーアドレス>","minecraftサーバーステータスを取得",false)
+        .addField("mcskin <ユーザー名>","minecraftスキンを取得",false)
+        .addField("mcbeskin <ユーザー名>","minecraft(BE)スキンを取得(new)",false)
+        .addField("gcset","グローバルチャットを設定",false)
+        .addField("poll <タイトル> <項目１> <項目２>...","投票を設定",false)
+        .addField("pollr <投票ID>","投票結果をグラフで表示",false)
+        .addField("omikuji","おみくじ",false)
+        .addField("dice","サイコロ 1から6",false)
+        .addField("vc","読み上げの開始/停止",false)
+        .addField("uuid","uuidを取得",false)
+        .addField("xuid","xuidを取得",false)
+        .addField("vote","v",false)
+        .addField("del <ユーザ名> <削除する数>","指定ユーザーのメッセージを一括削除",false)
+        .addField("url <url>","urlのリダイレクト先を表示",false)
+        .addField("urlcheck","危険URLの検出オン/オフ",false)
+        .build() //buildは一番最後の組み立て処理です。書き忘れないようにしましょう。
+    event?.reply(embed)
 }
 
 
@@ -105,7 +97,6 @@ class BotClient: ListenerAdapter(){
         val commandClient = CommandClientBuilder()
             .setPrefix(commandPrefix)
             .setOwnerId("")
-            .addCommands(urlchecksetting(),covidset(),Neko(),help(),about(),mcskin(),gcset(),poll(),pollresult(),mcserver(),omikuzi(),dice(),mcbeskin(),uuid(),xuid(),del(),urlredirect())
             .useHelpBuilder(false)
             .build()
 
@@ -125,10 +116,17 @@ class BotClient: ListenerAdapter(){
         AudioSourceManagers.registerRemoteSources(playerManager)
         covidtimer(event.jda)
         println("起動しました")
+        event.jda.upsertCommand("neko", "にゃーん").queue()
     }
 
     fun getEventWaiter(): EventWaiter? {
         return waiter
+    }
+
+    override fun onSlashCommand(event: SlashCommandEvent) {
+        if (event.name.equals("neko")) {
+            neko(event)
+        }
     }
 
     override fun onGuildMessageReceived(event : GuildMessageReceivedEvent) {
