@@ -17,7 +17,7 @@ import java.awt.Color
 import java.util.concurrent.TimeUnit
 import kotlin.math.max
 
-
+//無効
 class del: Command() {
     private var page = 0
     private var result:Member? = null

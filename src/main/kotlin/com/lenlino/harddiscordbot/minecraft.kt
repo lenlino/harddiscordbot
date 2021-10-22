@@ -3,6 +3,7 @@ package com.lenlino.harddiscordbot
 import com.jagrosh.jdautilities.command.Command
 import com.jagrosh.jdautilities.command.CommandEvent
 import net.dv8tion.jda.api.EmbedBuilder
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
@@ -13,182 +14,118 @@ import java.net.URL
 import java.net.URLConnection
 import java.nio.charset.Charset
 
-class uuid: Command(){
-    init {
-        this.name="uuid"
+fun uuid(event: SlashCommandEvent) {
+    event.deferReply().queue()
+    val api = readJsonFromUrl("https://api.mojang.com/users/profiles/minecraft/"+event?.getOption("username")?.asString)
+    if (!api.has("null")) {
+        val embed = EmbedBuilder()
+            .setTitle(api.getString("name"))
+            .setFooter(api.getString("id"))
+            .setColor(Color.PINK)
+            .build()
+        event?.hook.sendMessageEmbeds(embed).queue()
+    } else {
+        nouserembed(event)
     }
+}
 
-    override fun execute(event: CommandEvent?) {
-        val api = readJsonFromUrl("https://api.mojang.com/users/profiles/minecraft/"+event?.args)
-        if (!api.has("null")) {
+fun xuid(event: SlashCommandEvent) {
+    event.deferReply().queue()
+    try {
+        val xuid = readJsonFromUrl("https://xbl-api.prouser123.me/xuid/" + event.getOption("username")?.asString)
+        if (!xuid.has("error")) {
+            //GeyserMCサーバーよりテクスチャIDを取得
+            val id = xuid.getString("xuid")
             val embed = EmbedBuilder()
-                .setTitle(api.getString("name"))
-                .setFooter(api.getString("id"))
+                .setTitle(event.getOption("name")?.asString)
+                .addField("xuid",id,false)
                 .setColor(Color.PINK)
                 .build()
-            event?.reply(embed)
+            event.hook.sendMessageEmbeds(embed).queue()
         } else {
             nouserembed(event)
         }
+    } catch (e: FileNotFoundException) {
+        nouserembed(event)
     }
 }
 
-class xuid: Command(){
-    init {
-        this.name="xuid"
-    }
+fun mcserver(event: SlashCommandEvent) {
+    event.deferReply().queue()
+    val apiResponse:JSONObject = readJsonFromUrl("https://api.mcsrvstat.us/2/" + event.getOption("address")?.asString)
+    if (apiResponse.getBoolean("online") ) {
+        val players:JSONObject = apiResponse.getJSONObject("players")
+        val motd:JSONObject = apiResponse.getJSONObject("motd")
+        val embed = EmbedBuilder()
+            .setTitle("サーバー情報")
+            .addField("バージョン",apiResponse.getString("version"),false)
+            .addField("アドレス",apiResponse.getString("ip"),false)
+            .addField("プレーヤー数",players.getInt("online").toString()+"/"+players.getInt("max").toString(),false)
+            .addField("MOTD",motd.getJSONArray("clean").toString(),false)
+            .setThumbnail("https://api.mcsrvstat.us/icon/" + event.getOption("address")?.asString)
+            .setColor(Color.PINK)
+            .build()
+        event?.hook.sendMessageEmbeds(embed).queue()
 
-    override fun execute(event: CommandEvent?) {
-        if(event?.args?.isEmpty()==false) {
-            //APIよりゲーマタグからxuid取得
-            try {
-                val xuid = readJsonFromUrl("https://xbl-api.prouser123.me/xuid/" + event.args)
-                if (!xuid.has("error")) {
-                    //GeyserMCサーバーよりテクスチャIDを取得
-                    val id = xuid.getString("xuid")
-                    val embed = EmbedBuilder()
-                        .setTitle(event.args)
-                        .addField("xuid",id,false)
-                        .setColor(Color.PINK)
-                        .build()
-                    event.reply(embed)
-                } else {
-                    nouserembed(event)
-                }
-            } catch (e: FileNotFoundException) {
-                nouserembed(event)
-            }
-        } else {
-            val embed = EmbedBuilder()
-                .setTitle("ユーザー名を入力してください")
-                .setColor(Color.RED)
-                .build()
-            event?.reply(embed)
-        }
+    } else {
+        val embed = EmbedBuilder()
+            .setTitle("サーバー情報")
+            .appendDescription("サーバーはオフラインです")
+            .setColor(Color.RED)
+            .build()
+        event?.hook.sendMessageEmbeds(embed).queue()
     }
 }
 
-class mcserver: Command(){
-    init {
-        this.name="mcserver"
-        this.help="BOTの情報を表示"
+fun mcskin(event: SlashCommandEvent) {
+    event.deferReply().queue()
+    val api = readJsonFromUrl("https://api.mojang.com/users/profiles/minecraft/"+event.getOption("username")?.asString)
+    if (!api.has("null")) {
+        val embed = EmbedBuilder()
+            .setTitle(api.getString("name"))
+            .setThumbnail("https://crafatar.com/skins/"+api.getString("id"))
+            .setImage("https://crafatar.com/renders/body/"+api.getString("id"))
+            .setColor(Color.PINK)
+            .build()
+        event?.hook.sendMessageEmbeds(embed).queue()
+    } else {
+        nouserembed(event)
     }
+}
 
-    override fun execute(event: CommandEvent?) {
-        if(event?.args?.isEmpty()==false){
-            val apiResponse:JSONObject = readJsonFromUrl("https://api.mcsrvstat.us/2/" + event.args)
-            if (apiResponse.getBoolean("online") ) {
-                val players:JSONObject = apiResponse.getJSONObject("players")
-                val motd:JSONObject = apiResponse.getJSONObject("motd")
+fun mcbeskin(event: SlashCommandEvent) {
+    //https://github.com/crafatar/crafatar/issues/287を参考に作成
+    event.deferReply().queue()
+    try {
+        val xuid = readJsonFromUrl("https://xbl-api.prouser123.me/xuid/" + event.getOption("username")?.asString)
+        if (!xuid.has("error")) {
+            //GeyserMCサーバーよりテクスチャIDを取得
+            val id = readJsonFromUrl("https://api.geysermc.org/v1/skin/"+xuid.getString("xuid"))
+            if (id.getJSONObject("data").length()!=0){
                 val embed = EmbedBuilder()
-                    .setTitle("サーバー情報")
-                    .addField("バージョン",apiResponse.getString("version"),false)
-                    .addField("アドレス",apiResponse.getString("ip"),false)
-                    .addField("プレーヤー数",players.getInt("online").toString()+"/"+players.getInt("max").toString(),false)
-                    .addField("MOTD",motd.getJSONArray("clean").toString(),false)
-                    .setThumbnail("https://api.mcsrvstat.us/icon/" + event.args)
+                    .setTitle(event?.getOption("name")?.asString)
+                    .setImage("https://mc-heads.net/player/"+id.getJSONObject("data").getString("texture_id"))
+                    .setThumbnail("http://textures.minecraft.net/texture/"+id.getJSONObject("data").getString("texture_id"))
                     .setColor(Color.PINK)
                     .build()
-                event?.reply(embed)
-
-            } else {
-                val embed = EmbedBuilder()
-                    .setTitle("サーバー情報")
-                    .appendDescription("サーバーはオフラインです")
-                    .setColor(Color.RED)
-                    .build()
-                event?.reply(embed)
-            }
-
-        } else {
-            val embed = EmbedBuilder()
-                .setTitle("サーバーアドレスを入力してください")
-                .setColor(Color.RED)
-                .build()
-            event?.reply(embed)
-        }
-    }
-
-
-}
-
-class mcskin: Command() {
-    init {
-        this.name = "mcskin"
-        this.help = "minecraftのスキンを取得"
-    }
-
-    override fun execute(event: CommandEvent?) {
-        if(event?.args?.isEmpty()==false) {
-            val api = readJsonFromUrl("https://api.mojang.com/users/profiles/minecraft/"+event.args)
-            if (!api.has("null")) {
-                val embed = EmbedBuilder()
-                    .setTitle(api.getString("name"))
-                    .setThumbnail("https://crafatar.com/skins/"+api.getString("id"))
-                    .setImage("https://crafatar.com/renders/body/"+api.getString("id"))
-                    .setColor(Color.PINK)
-                    .build()
-                event?.reply(embed)
-            } else {
-                nouserembed(event)
-            }
-        } else {
-            val embed = EmbedBuilder()
-                .setTitle("ユーザー名を入力してください")
-                .setColor(Color.RED)
-                .build()
-            event?.reply(embed)
-        }
-    }
-}
-
-class mcbeskin: Command() {
-    init {
-        this.name = "mcbeskin"
-    }
-
-    override fun execute(event: CommandEvent?) {
-        //https://github.com/crafatar/crafatar/issues/287を参考に作成
-        if(event?.args?.isEmpty()==false) {
-            //APIよりゲーマタグからxuid取得
-            try {
-                val xuid = readJsonFromUrl("https://xbl-api.prouser123.me/xuid/" + event.args)
-                if (!xuid.has("error")) {
-                    //GeyserMCサーバーよりテクスチャIDを取得
-                    val id = readJsonFromUrl("https://api.geysermc.org/v1/skin/"+xuid.getString("xuid"))
-                    if (id.getJSONObject("data").length()!=0){
-                        val embed = EmbedBuilder()
-                            .setTitle(event?.args)
-                            .setImage("https://mc-heads.net/player/"+id.getJSONObject("data").getString("texture_id"))
-                            .setThumbnail("http://textures.minecraft.net/texture/"+id.getJSONObject("data").getString("texture_id"))
-                            .setColor(Color.PINK)
-                            .build()
-                        event?.reply(embed)
-                        return
-                    } else {
-                        val embed = EmbedBuilder()
-                            .setColor(Color.RED)
-                            .setTitle("GeyserMCのサーバー上にデータがありません。")
-                            .setDescription("GeyserMCが導入されているサーバーに入るとスキンが登録されます")
-                            .build()
-                        event?.reply(embed)
-
-                    }
-                } else {
-                    nouserembed(event)
-                    return
-                }
-            } catch (e: FileNotFoundException) {
-                nouserembed(event)
+                event?.hook.sendMessageEmbeds(embed).queue()
                 return
+            } else {
+                val embed = EmbedBuilder()
+                    .setColor(Color.RED)
+                    .setTitle("GeyserMCのサーバー上にデータがありません。")
+                    .setDescription("GeyserMCが導入されているサーバーに入るとスキンが登録されます")
+                    .build()
+                event?.hook.sendMessageEmbeds(embed).queue()
+
             }
         } else {
-            val embed = EmbedBuilder()
-                .setTitle("ユーザー名を入力してください")
-                .setColor(Color.RED)
-                .build()
-            event?.reply(embed)
+            nouserembed(event)
+            return
         }
+    } catch (e: FileNotFoundException) {
+        nouserembed(event)
+        return
     }
 }
 
@@ -220,29 +157,20 @@ fun readJsonFromUrl(url: String?): JSONObject {
     }
 }
 
-class about: Command(){
-    init {
-        this.name="about"
-        this.help="BOTの情報を表示"
-    }
-
-    override fun execute(event: CommandEvent?) {
-        val embed = EmbedBuilder()
-            .setTitle("Info")
-            .addField("サーバー導入数",event?.jda?.guilds?.size.toString(),false)
-            .setAuthor("BOTの招待はこちらから！","https://discord.com/api/oauth2/authorize?client_id=860827174541721600&permissions=0&scope=bot")
-            .setColor(Color.PINK)
-            .build()
-        event?.reply(embed)
-
-
-    }
+fun about(event: SlashCommandEvent) {
+    val embed = EmbedBuilder()
+        .setTitle("Info")
+        .addField("サーバー導入数",event?.jda?.guilds?.size.toString(),false)
+        .setAuthor("BOTを招待","https://discord.com/api/oauth2/authorize?client_id=860827174541721600&permissions=0&scope=bot%20applications.commands")
+        .setColor(Color.PINK)
+        .build()
+    event?.replyEmbeds(embed).queue()
 }
 
-fun nouserembed(event: CommandEvent?) {
+private fun nouserembed(event: SlashCommandEvent) {
     val embed = EmbedBuilder()
         .setTitle("ユーザーが存在しません")
         .setColor(Color.RED)
         .build()
-    event?.reply(embed)
+    event?.hook.sendMessageEmbeds(embed).queue()
 }

@@ -5,6 +5,7 @@ import com.google.common.collect.Interners.newBuilder
 import com.jagrosh.jdautilities.command.Command
 import com.jagrosh.jdautilities.command.CommandEvent
 import net.dv8tion.jda.api.EmbedBuilder
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent
 import java.awt.Color
 import java.io.IOException
 import java.net.URI
@@ -15,21 +16,11 @@ import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 import java.util.*
 
-
-class urlredirect: Command() {
-    init {
-        this.name="url"
-    }
-
-    override fun execute(event: CommandEvent?) {
-        if (event?.args==null) {
-            val embed = EmbedBuilder()
-                .setColor(Color.RED)
-                .setTitle("URLを入力してください")
-                .build()
-            event?.reply(embed)
-        }
-        val args = event?.args
+//無効
+class urlredirect {
+     fun url(event: SlashCommandEvent) {
+         event.deferReply().queue()
+        val args = event?.getOption("url")?.asString
         val embed = EmbedBuilder()
             .setColor(Color.PINK)
             .addField("元URL",args,false)
@@ -42,7 +33,7 @@ class urlredirect: Command() {
         if (embed.fields.size==1) {
             embed.setFooter("リダイレクトはありません")
         }
-        event?.reply(embed.build())
+        event?.hook.sendMessageEmbeds(embed.build()).queue()
     }
 
     @Throws(URISyntaxException::class, IOException::class, InterruptedException::class)

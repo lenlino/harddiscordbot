@@ -1,8 +1,6 @@
 package com.lenlino.harddiscordbot
 
-import com.jagrosh.jdautilities.command.Command
 import com.jagrosh.jdautilities.command.CommandClientBuilder
-import com.jagrosh.jdautilities.command.CommandEvent
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager
@@ -10,18 +8,15 @@ import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.JDABuilder
-import net.dv8tion.jda.api.entities.Message
-import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.events.ReadyEvent
-import net.dv8tion.jda.api.events.guild.GuildJoinEvent
-import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
+import net.dv8tion.jda.api.interactions.commands.OptionType
+import net.dv8tion.jda.api.interactions.commands.build.CommandData
 import net.dv8tion.jda.api.requests.GatewayIntent
 import org.json.JSONObject
 import java.awt.Color
-import java.awt.SystemColor.text
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
@@ -31,7 +26,6 @@ import java.net.URI
 import java.net.URISyntaxException
 import java.net.URL
 import java.sql.*
-import java.util.regex.Pattern
 
 
 fun neko(event: SlashCommandEvent){
@@ -49,8 +43,8 @@ fun neko(event: SlashCommandEvent){
     event.hook.sendMessageEmbeds(embed.build()).queue()
 }
 
-fun help(event: CommandEvent?){
-/*executeメソッドはコマンドを叩かれたイベントをキャッチして対応する処理を実行する中核部分です*/
+fun help(event: SlashCommandEvent){
+    event.deferReply().queue()
     val embed = EmbedBuilder()//EmbedBuilderでインスタンスを作成して、後から中身をセットします。
         //タイトル文字列。第2引数にURLを入れるとタイトルを指定URLへのリンクにできます
         .setTitle("ヘルプ")
@@ -58,9 +52,10 @@ fun help(event: CommandEvent?){
         //Botの情報。タイトルと同じくリンクを指定できる他、第3引数にアイコン画像を指定できます。
         //今回は自分のアバターアイコンを指定しました。
 
-        .appendDescription("すべてのコマンドの前には.をつける必要があります") //Embedの説明文
+        .appendDescription("すべてのコマンドの前には/をつける必要があります(vcコマンドを除く)") //Embedの説明文
         .setColor(Color.PINK) //Embed左端の色を設定します。今回は緑。
         .addField("about","BOTの導入数・BOT招待URLを表示",false)
+        .addField("avater", "discordアカウントのアイコン取得",false)
         .addField("neko","にゃー",false) //以下3つフィールドをセット
         .addField("mcserver <サーバーアドレス>","minecraftサーバーステータスを取得",false)
         .addField("mcskin <ユーザー名>","minecraftスキンを取得",false)
@@ -68,17 +63,15 @@ fun help(event: CommandEvent?){
         .addField("gcset","グローバルチャットを設定",false)
         .addField("poll <タイトル> <項目１> <項目２>...","投票を設定",false)
         .addField("pollr <投票ID>","投票結果をグラフで表示",false)
-        .addField("omikuji","おみくじ",false)
         .addField("dice","サイコロ 1から6",false)
-        .addField("vc","読み上げの開始/停止",false)
+        .addField(".vc","読み上げの開始/停止",false)
         .addField("uuid","uuidを取得",false)
         .addField("xuid","xuidを取得",false)
-        .addField("vote","v",false)
-        .addField("del <ユーザ名> <削除する数>","指定ユーザーのメッセージを一括削除",false)
         .addField("url <url>","urlのリダイレクト先を表示",false)
         .addField("urlcheck","危険URLの検出オン/オフ",false)
         .build() //buildは一番最後の組み立て処理です。書き忘れないようにしましょう。
-    event?.reply(embed)
+
+    event.hook.sendMessageEmbeds(embed).queue()
 }
 
 
@@ -115,8 +108,24 @@ class BotClient: ListenerAdapter(){
         val playerManager: AudioPlayerManager = DefaultAudioPlayerManager()
         AudioSourceManagers.registerRemoteSources(playerManager)
         covidtimer(event.jda)
+        event.jda.updateCommands()
+        event.jda.updateCommands()
+            .addCommands(CommandData("avater","アイコン取得").addOption(OptionType.USER, "user", "ユーザー名",true))
+            .addCommands(CommandData("neko", "にゃーん"))
+            .addCommands(CommandData("poll", "投票を作成").addOption(OptionType.STRING, "title_and_options", "投票タイトル 選択肢 各要素間は空白に!", true))
+            .addCommands(CommandData("pollr", "投票結果をグラフに表示").addOption(OptionType.STRING, "id", "投票メッセージID", true))
+            .addCommands(CommandData("uuid", "Minecraft UUIDを取得(JEのみ)").addOption(OptionType.STRING,"username","ユーザーID",true))
+            .addCommands(CommandData("about", "about"))
+            .addCommands(CommandData("mcserver", "Minecraftサーバー状態を取得").addOption(OptionType.STRING, "address","サーバーアドレス", true))
+            .addCommands(CommandData("mcskin", "Minecraftスキンを取得(JEのみ)").addOption(OptionType.STRING, "username", "ユーザID",true))
+            .addCommands(CommandData("mcbeskin", "Minecraftスキンを取得(BEのみ)").addOption(OptionType.STRING, "username", "ユーザーID",true))
+            .addCommands(CommandData("gcset", "グローバルチャットを設定"))
+            .addCommands(CommandData("dice","サイコロを振る"))
+            .addCommands(CommandData("xuid","Minecraft XUIDを取得(BEのみ)").addOption(OptionType.STRING, "username","ユーザーID",true))
+            .addCommands(CommandData("urlcheck", "危険URLの検出オン/オフ"))
+            .addCommands(CommandData("help","コマンド一覧"))
+            .queue()
         println("起動しました")
-        event.jda.upsertCommand("neko", "にゃーん").queue()
     }
 
     fun getEventWaiter(): EventWaiter? {
@@ -126,8 +135,32 @@ class BotClient: ListenerAdapter(){
     override fun onSlashCommand(event: SlashCommandEvent) {
         if (event.name.equals("neko")) {
             neko(event)
+        } else if (event.name.equals("poll")) {
+            poll(event)
+        } else if (event.name.equals("pollr")) {
+            pollr(event)
+        } else if (event.name.equals("uuid")) {
+            uuid(event)
+        } else if (event.name.equals("about")) {
+            about(event)
+        } else if (event.name.equals("mcserver")) {
+            mcserver(event)
+        } else if (event.name.equals("mcskin")) {
+            mcskin(event)
+        } else if (event.name.equals("mcbeskin")) {
+            mcbeskin(event)
+        } else if (event.name.equals("gcset")) {
+            gcset(event)
+        } else if (event.name.equals("dice")) {
+            dice(event)
+        } else if (event.name.equals("xuid")) {
+            xuid(event)
+        } else if (event.name.equals("urlcheck")) {
+            urlcheck(event)
+        } else if (event.name.equals("help")) {
+            help(event)
         }
-    }
+     }
 
     override fun onGuildMessageReceived(event : GuildMessageReceivedEvent) {
         if (dbcheck(event)) {

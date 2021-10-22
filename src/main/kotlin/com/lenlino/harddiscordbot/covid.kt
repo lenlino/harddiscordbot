@@ -7,49 +7,45 @@ import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.JDABuilder
 import net.dv8tion.jda.api.entities.ApplicationInfo
 import net.dv8tion.jda.api.entities.MessageActivity
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent
 import okhttp3.internal.wait
 import org.json.JSONObject
 import java.awt.Color
 import java.sql.Statement
 import java.util.*
 
-class covidset: Command() {
-    init {
-        this.name="covidset"
-    }
-
-    override fun execute(event: CommandEvent?) {
-        if (event!!.guild.ownerIdLong==event.member.idLong) {
-            val conn = getConnection()
-            val psts = conn?.prepareStatement("SELECT * FROM discord WHERE server_id = ?")
-            psts?.setString(1, event?.guild?.id)
-            val rs = psts?.executeQuery()
-            val embed = EmbedBuilder()
-                .setTitle("covid通知用チャンネルの設定が完了しました")
-                .setFooter("日本時間7時に自動配信されます。")
-                .setColor(Color.PINK)
-                .build()
-            if (!rs!!.next()) {
-                val ppst = conn?.prepareStatement("INSERT INTO discord (server_id,covid) values (?,?)")
-                ppst?.setString(1,event?.guild?.id)
-                ppst?.setString(2,event?.channel?.id)
-                ppst?.executeUpdate()
-                ppst?.close()
-                event?.reply(embed)
-            } else {
-                val ppstadd = conn?.prepareStatement("UPDATE discord SET covid = ? WHERE server_id = ?")
-                ppstadd?.setString(1,event?.channel?.id)
-                ppstadd?.setString(2,event?.guild?.id)
-                ppstadd?.executeUpdate()
-                ppstadd?.close()
-                event?.reply(embed)
-            }
-            psts?.close()
-            conn?.close()
+fun covidset(event: SlashCommandEvent) {
+    event.deferReply().queue()
+    if (event.guild?.ownerIdLong==event.member?.idLong) {
+        val conn = getConnection()
+        val psts = conn?.prepareStatement("SELECT * FROM discord WHERE server_id = ?")
+        psts?.setString(1, event?.guild?.id)
+        val rs = psts?.executeQuery()
+        val embed = EmbedBuilder()
+            .setTitle("covid通知用チャンネルの設定が完了しました")
+            .setFooter("日本時間7時に自動配信されます。")
+            .setColor(Color.PINK)
+            .build()
+        if (!rs!!.next()) {
+            val ppst = conn?.prepareStatement("INSERT INTO discord (server_id,covid) values (?,?)")
+            ppst?.setString(1,event?.guild?.id)
+            ppst?.setString(2,event?.channel?.id)
+            ppst?.executeUpdate()
+            ppst?.close()
+            event.hook.sendMessageEmbeds(embed).queue()
         } else {
-            val embed = EmbedBuilder().setColor(Color.RED).setTitle("このコマンドはサーバー管理者のみが実行できます").build()
-            event.reply(embed)
+            val ppstadd = conn?.prepareStatement("UPDATE discord SET covid = ? WHERE server_id = ?")
+            ppstadd?.setString(1,event?.channel?.id)
+            ppstadd?.setString(2,event?.guild?.id)
+            ppstadd?.executeUpdate()
+            ppstadd?.close()
+            event.hook.sendMessageEmbeds(embed).queue()
         }
+        psts?.close()
+        conn?.close()
+    } else {
+        val embed = EmbedBuilder().setColor(Color.RED).setTitle("このコマンドはサーバー管理者のみが実行できます").build()
+        event.hook.sendMessageEmbeds(embed).queue()
     }
 }
 

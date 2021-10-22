@@ -10,7 +10,7 @@ import org.java_websocket.handshake.ServerHandshake
 import java.net.URI
 import javax.net.ssl.SSLContext
 
-
+//無効
 class eewset: Command() {
     init {
         this.name = "eewset"
