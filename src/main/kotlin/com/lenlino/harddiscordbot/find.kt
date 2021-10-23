@@ -1,5 +1,6 @@
 package com.lenlino.harddiscordbot
 
+import com.fasterxml.jackson.databind.KeyDeserializer
 import com.jagrosh.jdautilities.command.Command
 import com.jagrosh.jdautilities.command.CommandEvent
 import kotlinx.coroutines.delay
@@ -13,6 +14,7 @@ import net.dv8tion.jda.api.events.interaction.ButtonClickEvent
 import net.dv8tion.jda.api.interactions.components.Button
 import net.dv8tion.jda.api.interactions.components.ButtonStyle
 import okhttp3.internal.wait
+import org.apache.commons.lang3.ObjectUtils
 import java.awt.Color
 import java.util.concurrent.TimeUnit
 import kotlin.math.max
@@ -46,24 +48,30 @@ class del: Command() {
         }
         val args = event.args.replace("　"," ").split(" ")
         val target_list = event.guild.getMembersByName(args[0],false)
-        if (target_list.size==0) {
+        val target = event.guild.getMemberById(args[0])
+        if (target_list.size==0 && target == null) {
             val embed = EmbedBuilder()
                 .setTitle("ユーザーが見つかりません")
                 .setColor(Color.RED)
                 .build()
             event.reply(embed)
             return
+        } else if (target != null) {
+            select_member(event,args[0],false)
         }
-        select_member(event,args[0])
-
-        //メッセージ取得
+        select_member(event,args[0],true)
+    //メッセージ取得
 
     }
 
-    fun select_member(event: CommandEvent, string: String) {
+    fun select_member(event: CommandEvent, string: String, id: Boolean) {
+        if (id == true){
 
+            val members: ArrayList<Member> = arrayListOf(event.guild.getMemberById(string)!!)
+            waiter(button_menu(event,page,members),members,event)
+            return
+        }
         val members = event.guild.getMembersByName(string,false)
-
         waiter(button_menu(event,page,members),members,event)
     }
 
