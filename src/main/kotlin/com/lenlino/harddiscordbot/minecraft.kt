@@ -160,7 +160,7 @@ class mcbeskin: Command() {
                         val embed = EmbedBuilder()
                             .setTitle(event?.args)
                             .setImage("https://mc-heads.net/player/"+id.getString("texture_id"))
-                            .setThumbnail("http://textures.minecraft.net/texture/"+id.getJSONObject("data").getString("texture_id"))
+                            .setThumbnail("http://textures.minecraft.net/texture/"+id.getString("texture_id"))
                             .setColor(Color.PINK)
                             .build()
                         event?.reply(embed)
