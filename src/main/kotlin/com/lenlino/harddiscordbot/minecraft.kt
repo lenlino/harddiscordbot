@@ -155,7 +155,7 @@ class mcbeskin: Command() {
                 val xuid = readJsonFromUrl("https://xbl-api.prouser123.me/xuid/" + event.args)
                 if (!xuid.has("error")) {
                     //GeyserMCサーバーよりテクスチャIDを取得
-                    val id = readJsonFromUrl("https://api.geysermc.org/v1/skin/"+xuid.getString("xuid"))
+                    val id = readJsonFromUrl("https://api.geysermc.org/v2/skin/"+xuid.getString("xuid"))
                     if (id.getJSONObject("data").length()!=0){
                         val embed = EmbedBuilder()
                             .setTitle(event?.args)
