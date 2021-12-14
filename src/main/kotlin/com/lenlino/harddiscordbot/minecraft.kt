@@ -156,7 +156,7 @@ class mcbeskin: Command() {
                 if (!xuid.has("error")) {
                     //GeyserMCサーバーよりテクスチャIDを取得
                     val id = readJsonFromUrl("https://api.geysermc.org/v2/skin/"+xuid.getString("xuid"))
-                    if (id.getString("texture_id")!=null){
+                    if (id!=null){
                         val embed = EmbedBuilder()
                             .setTitle(event?.args)
                             .setImage("https://mc-heads.net/player/"+id.getString("texture_id"))
