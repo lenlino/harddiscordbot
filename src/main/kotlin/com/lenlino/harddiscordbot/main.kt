@@ -106,7 +106,8 @@ class BotClient: ListenerAdapter(){
         val commandClient = CommandClientBuilder()
             .setPrefix(commandPrefix)
             .setOwnerId("")
-            .addCommands(urlchecksetting(),covidset(),Neko(),help(),about(),mcskin(),gcset(),poll(),pollresult(),mcserver(),omikuzi(),dice(),mcbeskin(),uuid(),xuid(),del(),urlredirect())
+            .addCommands(urlchecksetting(),covidset(),Neko(),help(),about(),mcskin(),gcset(),poll(),pollresult(),
+                mcserver(),omikuzi(),dice(),mcbeskin(),uuid(),xuid(),del(),urlredirect())
             .useHelpBuilder(false)
             .build()
 
@@ -260,7 +261,10 @@ class BotClient: ListenerAdapter(){
 fun main() {
     val token = System.getenv("Discord_Bot_Token")
     val bot = BotClient()
+    val token_2 = System.getenv("Discord_Bot_Token2")
+    val bot_2 = BotClient()
     bot.main(token)
+    bot_2.main(token_2)
 
 }
 
